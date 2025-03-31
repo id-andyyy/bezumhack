@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Защищенная страница</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Вы успешно вошли!</h1>
+        
+        <div class="success" style="margin: 20px 0; font-size: 18px;">
+            Это защищенная страница. Доступ разрешен только авторизованным пользователям.
+        </div>
+        
+        <div class="menu">
+            <a href="/">Вернуться на главную</a>
+            <a href="/logout" style="margin-left: 15px; background-color: #ff4d4d;">Выйти из аккаунта</a>
+        </div>
+    </div>
+</body>
+</html>
