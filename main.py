@@ -13,11 +13,7 @@ from typing import List, Optional
 
 
 os.makedirs("static", exist_ok=True)
-
-# models.Base.metadata.drop_all(bind=engine)
 models.Base.metadata.create_all(bind=engine)
-
-# Добавление тестовых товаров при запуске, если их нет
 def create_test_products():
     db = next(get_db())
     products_count = db.query(models.User).filter(models.User.is_product != 0).count()
@@ -106,10 +102,12 @@ def verify_credentials(credentials: HTTPBasicCredentials, db: Session):
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, db: Session = Depends(get_db), username: Optional[str] = None):
-    # Получаем все товары
-    products = db.query(models.User).filter(models.User.is_product != 0).all()
-    
-    # Генерируем HTML для товаров
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
+        
+    products = db.query(models.User).filter(models.User.is_product != 0).all()    
     products_html = ""
     for product in products:
         product_image = ""
@@ -124,11 +122,9 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
             {product_image}
             <div class="item-price rotate-text">{product.price} руб.</div>
             <div class="left-align" style="font-family: 'Wingdings', cursive;">{product.description}</div>
-            <button style="background-color:lime; font-weight:bold; margin-top:5px; transform: rotate({product.id * 5}deg);" class="shake">КУПИТЬ!</button>
+            <a href="/product/{product.id}{username_param}" style="text-decoration: none;"><button style="background-color:lime; font-weight:bold; margin-top:5px; transform: rotate({product.id * 5}deg);" class="shake">КУПИТЬ!</button></a>
         </div>
         '''
-    
-    # Блок авторизации в зависимости от наличия пользователя
     auth_block = '''
     <div>
         <a href="/register-page" class="rainbow-text">Регистрация</a> | 
@@ -136,12 +132,7 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
         <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
     '''
-    
-    # Получаем параметр username из URL (плохая практика - не проверяем авторизацию)
-    url_username = request.query_params.get('username')
-    username_param = ""
     if url_username:
-        username_param = f"?username={url_username}"
         user = db.query(models.User).filter(
             models.User.username == url_username,
             models.User.is_product == 0
@@ -155,8 +146,6 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
                 <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 20px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
             </div>
             '''
-    
-    # Возвращаем весь HTML-код напрямую из Python
     return f'''<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -285,13 +274,6 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
             animation: borderColor 2s infinite;
         }}
         
-        @keyframes borderColor {{
-            0% {{ border-color: gold; }}
-            33% {{ border-color: red; }}
-            66% {{ border-color: blue; }}
-            100% {{ border-color: gold; }}
-        }}
-        
         .item-title {{
             font-weight: bold;
             margin: 2px 0;
@@ -407,6 +389,45 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
             85% {{ color: violet; }}
             100% {{ color: red; }}
         }}
+        
+        .zakadrit-button {{
+            position: fixed;
+            bottom: 40%;
+            right: 40%;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff0000);
+            background-size: 400% 400%;
+            animation: gradientBG 3s ease infinite, shake 0.3s infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            border: 10px solid;
+            border-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) 1;
+            cursor: pointer;
+            box-shadow: 0 0 50px rgba(255, 0, 255, 1);
+            z-index: 9999;
+            border-radius: 50%;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+        }}
+        
+        @keyframes gradientBG {{
+            0% {{ background-position: 0% 50%; }}
+            50% {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
+        }}
+        
+        @keyframes borderColor {{
+            0% {{ border-color: gold; }}
+            33% {{ border-color: red; }}
+            66% {{ border-color: blue; }}
+            100% {{ border-color: gold; }}
+        }}
     </style>
 </head>
 <body>
@@ -469,6 +490,11 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
             Разработано профессиональной командой дизайнеров с 20-летним опытом!
         </div>
     </div>
+    
+    <a href="/tinder-swipe{username_param}" class="zakadrit-button">
+        <span>ЗАКАДРИТЬ</span>
+        <span>СУЧКУ!</span>
+    </a>
 </body>
 </html>'''
 
@@ -685,8 +711,6 @@ def register(
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    
-    # После регистрации сразу перенаправляем на главную с именем пользователя
     return RedirectResponse(url=f"/?username={username}", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post("/login-form")
@@ -698,20 +722,17 @@ def login_form(
 ):
     user = db.query(models.User).filter(
         models.User.username == username,
-        models.User.is_product == 0  # Это пользователь, а не товар
+        models.User.is_product == 0
     ).first()
     
     if not user:
-        # Возвращаем страницу логина с ошибкой
         error = "Пользователь не существует"
         return RedirectResponse(url=f"/login-page?error={error}", status_code=status.HTTP_303_SEE_OTHER)
     
     if user.password != password:
-        # Возвращаем страницу логина с ошибкой
         error = "Неверный пароль"
         return RedirectResponse(url=f"/login-page?error={error}", status_code=status.HTTP_303_SEE_OTHER)
     
-    # Перенаправляем на главную страницу с указанием имени пользователя в URL
     return RedirectResponse(url=f"/?username={username}", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post("/login")
@@ -724,7 +745,6 @@ def login(
 
 @app.get("/protected-page", response_class=HTMLResponse)
 async def protected_page(request: Request):
-    # Получаем параметр username из URL
     url_username = request.query_params.get('username')
     username_param = ""
     if url_username:
@@ -909,23 +929,19 @@ def protected_route(credentials: HTTPBasicCredentials = Depends(security), db: S
 
 @app.get("/logout", response_class=HTMLResponse)
 async def logout():
-    # Просто перенаправляем на главную без параметров, чтобы "выйти"
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/products", response_class=HTMLResponse)
 async def list_products(request: Request, db: Session = Depends(get_db)):
-    # Получаем все товары
     products = db.query(models.User).filter(models.User.is_product != 0).all()
-    
-    # Генерируем HTML для товаров
     products_html = ""
     for product in products:
         product_image = ""
         if product.image_url:
-            product_image = f'<img src="{product.image_url}" alt="{product.name}" class="product-image" style="transform: rotate({product.id * 3}deg);">'
+            product_image = f'<img src="{product.image_url}" alt="{product.name}" class="product-image epilepsy-image" style="transform: rotate({product.id * 3}deg);">'
         elif product.gif_base64:
-            product_image = f'<img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" class="product-image" style="transform: rotate({-product.id * 5}deg);">'
+            product_image = f'<img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" class="product-image epilepsy-image" style="transform: rotate({-product.id * 5}deg);">'
             
         products_html += f'''
         <div class="product" style="transform: rotate({(product.id % 3) - 1}deg);">
@@ -935,11 +951,9 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             <p style="font-family: 'Wingdings', cursive;">{product.description}</p>
             <p class="rainbow-text">ID продавца: {product.owner_id}</p>
             <input type="hidden" id="secret_{product.id}" value="{product.secret_info}">
-            <button onclick="buyProduct({product.id})" class="buy-button shake" style="transform: rotate({product.id * 2}deg);">КУПИТЬ СЕЙЧАС!!!</button>
+            <a href="/product/{product.id}{username_param}" class="buy-link"><button class="buy-button shake" style="transform: rotate({product.id * 2}deg);">КУПИТЬ СЕЙЧАС!!!</button></a>
         </div>
         '''
-    
-    # Форма добавления товара
     add_product_form = '''
     <h2 class="blink" style="color:#FF00FF; font-size: 32px; text-shadow: 3px 3px 0 yellow, -3px -3px 0 lime;">Добавить новый товар</h2>
     <form action="/add-product" method="post" class="add-form" style="transform: rotate(-1deg);">
@@ -975,8 +989,6 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
         <button type="submit" class="blink shake" style="font-size: 24px; padding: 10px 20px;">Добавить товар СЕЙЧАС!!!</button>
     </form>
     '''
-    
-    # Форма поиска товаров
     search_form = '''
     <h2 class="blink" style="color:#FF00FF; font-size: 32px; text-shadow: 3px 3px 0 yellow, -3px -3px 0 lime;">Поиск товаров по пользователю</h2>
     <form action="/products-by-user" method="get" class="search-form" style="transform: rotate(1deg);">
@@ -988,8 +1000,6 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
         <button type="button" onclick="executeQuery()" class="rainbow-button shake">Найти через JavaScript</button>
     </form>
     '''
-    
-    # Получаем параметр username из URL (для сохранения авторизации)
     url_username = request.query_params.get('username')
     username_param = ""
     if url_username:
@@ -1081,6 +1091,19 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             animation: borderColor 2s infinite;
         }}
         
+        .epilepsy-image {{
+            animation: epilepsy 0.1s infinite, borderColor 2s infinite, shake 0.2s infinite;
+            filter: hue-rotate(0deg);
+        }}
+        
+        @keyframes epilepsy {{
+            0% {{ filter: hue-rotate(0deg) contrast(200%) brightness(150%); }}
+            25% {{ filter: hue-rotate(90deg) contrast(300%) brightness(200%); }}
+            50% {{ filter: hue-rotate(180deg) contrast(400%) brightness(250%); }}
+            75% {{ filter: hue-rotate(270deg) contrast(300%) brightness(200%); }}
+            100% {{ filter: hue-rotate(360deg) contrast(200%) brightness(150%); }}
+        }}
+        
         @keyframes borderColor {{
             0% {{ border-color: gold; }}
             33% {{ border-color: red; }}
@@ -1103,6 +1126,63 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             cursor: pointer;
             font-size: 20px;
             animation: borderColor 1s infinite;
+        }}
+        
+        .buy-link {{
+            text-decoration: none;
+        }}
+        
+        .big-button-container {{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin: 40px 0;
+            position: relative;
+            z-index: 1000;
+        }}
+        
+        .big-square-button {{
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff0000);
+            background-size: 400% 400%;
+            animation: gradientBG 3s ease infinite, shake 0.3s infinite, rotate 5s linear infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            font-weight: bold;
+            border: 10px solid;
+            border-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) 1;
+            cursor: pointer;
+            box-shadow: 0 0 50px rgba(255, 0, 255, 1);
+        }}
+        
+        @keyframes gradientBG {{
+            0% {{ background-position: 0% 50%; }}
+            50% {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
+        }}
+        
+        @keyframes rotate {{
+            0% {{ transform: rotate(0deg); }}
+            100% {{ transform: rotate(360deg); }}
+        }}
+        
+        @keyframes shake {{
+            0% {{ transform: translate(1px, 1px) rotate(0deg); }}
+            10% {{ transform: translate(-1px, -2px) rotate(-1deg); }}
+            20% {{ transform: translate(-3px, 0px) rotate(1deg); }}
+            30% {{ transform: translate(3px, 2px) rotate(0deg); }}
+            40% {{ transform: translate(1px, -1px) rotate(1deg); }}
+            50% {{ transform: translate(-1px, 2px) rotate(-1deg); }}
+            60% {{ transform: translate(-3px, 1px) rotate(0deg); }}
+            70% {{ transform: translate(3px, 1px) rotate(-1deg); }}
+            80% {{ transform: translate(-1px, -1px) rotate(1deg); }}
+            90% {{ transform: translate(1px, 2px) rotate(0deg); }}
+            100% {{ transform: translate(1px, -2px) rotate(-1deg); }}
         }}
         
         .add-form, .search-form {{
@@ -1154,34 +1234,6 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             font-size: 18px;
         }}
         
-        .blink {{
-            animation: blinker 0.3s linear infinite;
-        }}
-        
-        @keyframes blinker {{
-            50% {{ opacity: 0; }}
-        }}
-        
-        @keyframes shake {{
-            0% {{ transform: translate(1px, 1px) rotate(0deg); }}
-            10% {{ transform: translate(-1px, -2px) rotate(-1deg); }}
-            20% {{ transform: translate(-3px, 0px) rotate(1deg); }}
-            30% {{ transform: translate(3px, 2px) rotate(0deg); }}
-            40% {{ transform: translate(1px, -1px) rotate(1deg); }}
-            50% {{ transform: translate(-1px, 2px) rotate(-1deg); }}
-            60% {{ transform: translate(-3px, 1px) rotate(0deg); }}
-            70% {{ transform: translate(3px, 1px) rotate(-1deg); }}
-            80% {{ transform: translate(-1px, -1px) rotate(1deg); }}
-            90% {{ transform: translate(1px, 2px) rotate(0deg); }}
-            100% {{ transform: translate(1px, -2px) rotate(-1deg); }}
-        }}
-        
-        h1, h2 {{
-            color: #FF00FF;
-            text-shadow: 3px 3px 0 yellow, -3px -3px 0 lime;
-            transform: skew(-5deg, 2deg);
-        }}
-        
         .rainbow-text {{
             animation: rainbow 1s infinite;
             font-size: 18px;
@@ -1220,7 +1272,15 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
         !!! СУПЕР АКЦИЯ: КАЖДЫЙ ТРЕТИЙ ТОВАР В ПОДАРОК !!! ТОЛЬКО СЕГОДНЯ !!! СПЕШИТЕ !!!
     </marquee>
 
-    <div class="products-container" style="margin-top: 20px;">
+    <div class="big-button-container">
+        <a href="/tinder-swipe{username_param}" class="big-square-button">
+            <span style="font-family: 'Comic Sans MS', cursive;">З</span><span style="font-family: 'Arial Black', sans-serif;">А</span><span style="font-family: 'Impact', sans-serif;">К</span><span style="font-family: 'Times New Roman', serif;">А</span><span style="font-family: 'Courier New', monospace;">Д</span><span style="font-family: 'Verdana', sans-serif;">Р</span><span style="font-family: 'Georgia', serif;">И</span><span style="font-family: 'Trebuchet MS', sans-serif;">Т</span><span style="font-family: 'Webdings';">Ь</span>
+            <br>
+            <span style="font-family: 'Wingdings';">С</span><span style="font-family: 'Lucida Console', monospace;">У</span><span style="font-family: 'Brush Script MT', cursive;">Ч</span><span style="font-family: 'Papyrus', fantasy;">К</span><span style="font-family: 'Copperplate', fantasy;">У</span>
+        </a>
+    </div>
+
+    <div class="products-container">
         {products_html}
     </div>
 
@@ -1229,47 +1289,15 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
     {search_form}
 
     <script>
-        function buyProduct(id) {{
-            alert('ПОЗДРАВЛЯЕМ!!! 🎉🎉🎉 Товар куплен! Но на самом деле нет. ID: ' + id);
-            // Небезопасно - показываем секретные данные
-            const secretData = document.getElementById('secret_' + id).value;
-            if (secretData) {{
-                alert('Секретные данные товара: ' + secretData);
-            }}
+        function buyProduct(productId) {{
+            alert('Товар ' + productId + ' куплен! Мы уже отправили ваши данные на сервер!');
+            window.location.href = '/product/' + productId;
         }}
         
         function executeQuery() {{
-            let username = document.getElementById('username').value;
-            // Потенциально опасное построение SQL-запроса в коде
-            let query = `
-            SELECT * FROM users 
-            WHERE is_product != 0 
-            AND owner_id IN (
-                SELECT id FROM users 
-                WHERE username = '${{username}}' AND is_product = 0
-            )`;
-            console.log("Выполняем запрос: " + query);
-            // Отправляем запрос на сервер
-            fetch('/products-by-user?username=' + username)
-                .then(response => response.json())
-                .then(data => {{
-                    console.log(data);
-                    alert('НАЙДЕНО ТОВАРОВ: ' + (data.products ? data.products.length : 0) + ' !!! 🎉🎉🎉');
-                }});
+            var username = document.getElementById('username').value;
+            window.location.href = '/products-by-user?username=' + encodeURIComponent(username);
         }}
-        
-        // Добавляем анимации при наведении на элементы
-        document.addEventListener('DOMContentLoaded', function() {{
-            const products = document.querySelectorAll('.product');
-            products.forEach(product => {{
-                product.addEventListener('mouseover', function() {{
-                    this.style.transform = 'scale(1.05) rotate(' + (Math.random() * 10 - 5) + 'deg)';
-                }});
-                product.addEventListener('mouseout', function() {{
-                    this.style.transform = 'rotate(' + (Math.random() * 6 - 3) + 'deg)';
-                }});
-            }});
-        }});
     </script>
     
     <footer style="background-color: #CCFFCC; padding: 20px; text-align: center; border: 4px solid green; animation: backgroundFlash 3s infinite; margin-top: 30px;">
@@ -1281,6 +1309,11 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
         </div>
         <img src="https://web.archive.org/web/20090830181814/http://geocities.com/ResearchTriangle/Campus/5288/worknew.gif" alt="Under Construction" style="height:80px; margin-top: 10px; animation: shake 0.5s infinite;">
     </footer>
+    
+    <a href="/tinder-swipe{username_param}" class="zakadrit-button">
+        <span>ЗАКАДРИТЬ</span>
+        <span>СУЧКУ!</span>
+    </a>
 </body>
 </html>'''
 
@@ -1295,9 +1328,6 @@ def add_product(
     gif_base64: str = Form(None),
     db: Session = Depends(get_db)
 ):
-    # Отладочный вывод для проверки
-    print(f"Добавление товара: {name}, {price}, {description}, {owner_id}")
-    print(f"is_product установлен как: 1")
     
     new_product = models.User(
         is_product=1,
@@ -1321,7 +1351,7 @@ def add_product(
     return RedirectResponse(url="/products", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.get("/product/{product_id}")
-def get_product(product_id: int, db: Session = Depends(get_db)):
+def get_product_json(product_id: int, db: Session = Depends(get_db)):
     product = db.query(models.User).filter(
         models.User.id == product_id,
         models.User.is_product != 0
@@ -1331,48 +1361,915 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Товар не найден")
     return product
 
-@app.get("/products-by-user")
-def get_products_by_user(username: str = Query(...), db: Session = Depends(get_db)):
-    conn = sqlite3.connect('app.db')
-    cursor = conn.cursor()
-    query = f"""
-    SELECT * FROM users 
-    WHERE is_product != 0 
-    AND owner_id IN (
-        SELECT id FROM users 
-        WHERE username = '{username}' AND is_product = 0
-    )
-    """
-    cursor.execute(query)
-    products = cursor.fetchall()
-    conn.close()
-    return {"products": products}
-
-@app.get("/admin-panel")
-def admin_panel(request: Request, db: Session = Depends(get_db)):
-
-    admin_flag = request.query_params.get("admin", "0")
-    if admin_flag == "1":
-        users = db.query(models.User).filter(models.User.is_product == 0).all()
-        products = db.query(models.User).filter(models.User.is_product != 0).all()
+@app.get("/product/{product_id}/html", response_class=HTMLResponse)
+def get_product_html(product_id: int, request: Request, db: Session = Depends(get_db)):
+    product = db.query(models.User).filter(
+        models.User.id == product_id,
+        models.User.is_product != 0
+    ).first()
+    
+    if not product:
+        raise HTTPException(status_code=404, detail="Товар не найден")
+    
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
+    
+    product_image = ""
+    if product.image_url:
+        product_image = f'<img src="{product.image_url}" alt="{product.name}" class="product-image epilepsy-image" style="transform: rotate({product.id * 3}deg);">'
+    elif product.gif_base64:
+        product_image = f'<img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" class="product-image epilepsy-image" style="transform: rotate({-product.id * 5}deg);">'
+    
+    return f'''<!DOCTYPE html>
+<html>
+<head>
+    <title>СУПЕР ТОВАР: {product.name}</title>
+    <style>
+        @keyframes backgroundFlash {{
+            0% {{ background-color: #ff00ff; }}
+            25% {{ background-color: #00ff00; }}
+            50% {{ background-color: #0000ff; }}
+            75% {{ background-color: #ffff00; }}
+            100% {{ background-color: #ff00ff; }}
+        }}
         
-        return {
-            "users": [{"id": u.id, "username": u.username, "password": u.password, "credit_card": u.credit_card} for u in users],
-            "products": [
-                {
-                    "id": p.id, 
-                    "name": p.name, 
-                    "price": p.price, 
-                    "owner_id": p.owner_id, 
-                    "secret_info": p.secret_info,
-                    "image_url": p.image_url,
-                    "gif_base64": p.gif_base64
-                } 
-                for p in products
-            ]
-        }
-    else:
-        raise HTTPException(status_code=403, detail="Доступ запрещен")
+        @keyframes backgroundSpin {{
+            0% {{ transform: rotate(0deg); }}
+            100% {{ transform: rotate(360deg); }}
+        }}
+        
+        body {{
+            font-family: Comic Sans MS, cursive;
+            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            margin: 0;
+            padding: 20px;
+            animation: backgroundFlash 2s infinite;
+            overflow-x: hidden;
+            cursor: url('https://cur.cursors-4u.net/cursors/cur-1054.cur'), auto;
+        }}
+        
+        body:before {{
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            opacity: 0.7;
+            z-index: -1;
+            animation: backgroundSpin 15s linear infinite;
+            transform-origin: center center;
+        }}
+        
+        .header {{
+            text-align: center;
+            margin-bottom: 20px;
+            animation: shake 0.5s infinite;
+        }}
+        
+        .nav {{
+            margin-bottom: 20px;
+            background-color: #CCFFFF;
+            padding: 5px;
+            text-align: center;
+            border: 5px dashed blue;
+            animation: backgroundFlash 1s infinite;
+        }}
+        
+        .nav a {{
+            color: blue;
+            text-decoration: underline wavy red;
+            margin: 0 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }}
+        
+        .product-container {{
+            border: 4px dotted purple;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 800px;
+            background-color: #FFFFCC;
+            animation: backgroundFlash 3s infinite;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+            position: relative;
+            z-index: 1;
+        }}
+        
+        .product-image {{
+            max-width: 80%;
+            max-height: 400px;
+            margin: 10px auto;
+            display: block;
+            border: 8px ridge gold;
+            animation: borderColor 2s infinite;
+        }}
+        
+        .epilepsy-image {{
+            animation: epilepsy 0.1s infinite, borderColor 2s infinite, shake 0.2s infinite;
+            filter: hue-rotate(0deg);
+        }}
+        
+        @keyframes epilepsy {{
+            0% {{ filter: hue-rotate(0deg) contrast(200%) brightness(150%); }}
+            25% {{ filter: hue-rotate(90deg) contrast(300%) brightness(200%); }}
+            50% {{ filter: hue-rotate(180deg) contrast(400%) brightness(250%); }}
+            75% {{ filter: hue-rotate(270deg) contrast(300%) brightness(200%); }}
+            100% {{ filter: hue-rotate(360deg) contrast(200%) brightness(150%); }}
+        }}
+        
+        @keyframes borderColor {{
+            0% {{ border-color: gold; }}
+            33% {{ border-color: red; }}
+        .zakadrit-button {{
+            position: fixed;
+            bottom: 40%;
+            right: 40%;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff0000);
+            background-size: 400% 400%;
+            animation: gradientBG 3s ease infinite, shake 0.3s infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            border: 10px solid;
+            border-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) 1;
+            cursor: pointer;
+            box-shadow: 0 0 50px rgba(255, 0, 255, 1);
+            z-index: 9999;
+            border-radius: 50%;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+        }}
+        
+        @keyframes gradientBG {{
+            0% {{ background-position: 0% 50%; }}
+            50% {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="blink" style="font-size: 50px; color: red; text-shadow: 3px 3px 0 yellow;">ЗАКАДРИ СУЧКУ!!!</h1>
+        <div style="font-size: 30px; font-weight: bold; color: blue; text-shadow: 0 0 5px yellow;" class="shake">
+            СВАЙПАЙ ТОВАРЫ КАК В ТИНДЕРЕ!!! НАЙДИ СВОЮ ЛЮБОВЬ!!!
+        </div>
+    </div>
+    
+    <div class="nav">
+        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
+        <a href="/products{username_param}" class="rainbow-text">Товары</a> | 
+        <a href="/login-page" class="rainbow-text">Войти</a> | 
+        <a href="/register-page" class="rainbow-text">Регистрация</a> |
+        <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
+        <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
+    </div>
+    
+    <marquee scrollamount="20" behavior="alternate" style="background-color: red; color: yellow; font-size: 36px; font-weight: bold; padding: 15px; border: 5px dashed blue;">
+        !!! СВАЙПАЙ ВПРАВО И ЗАКАДРИ ТОВАР !!! СВАЙПАЙ ВЛЕВО ЧТОБ ОТКАЗАТЬ !!!
+    </marquee>
+    
+    <div class="tinder-container" id="tinder-container">
+        <!-- Карточки товаров будут добавлены через JavaScript -->
+    </div>
+    
+    <div class="tinder-buttons">
+        <button class="dislike-button" onclick="dislikeProduct()">❌</button>
+        <button class="like-button" onclick="likeProduct()">❤️</button>
+    </div>
+    
+    <div class="liked-products">
+        <div class="liked-title blink">ЗАКАДРЕННЫЕ ТОВАРЫ:</div>
+        <div class="product-list" id="liked-products-list"></div>
+    </div>
+    
+    <div class="disliked-products">
+        <div class="disliked-title blink">ОТВЕРГНУТЫЕ ТОВАРЫ:</div>
+        <div class="product-list" id="disliked-products-list"></div>
+    </div>
+    
+    <a href="/products{username_param}" class="zakadrit-button">
+        <span>ЗАКАДРИТЬ</span>
+        <span>СУЧКУ!</span>
+    </a>
+    
+    <script>
+        // Список всех товаров
+        const products = {products_json};
+        
+        // Перемешиваем товары
+        function shuffleArray(array) {{
+            for (let i = array.length - 1; i > 0; i--) {{
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }}
+            return array;
+        }}
+        
+        const shuffledProducts = shuffleArray([...products]);
+        let currentProductIndex = 0;
+        
+        const likedProducts = [];
+        const dislikedProducts = [];
+        
+        // Функция для создания карточки товара
+        function createProductCard(product, isActive = false) {{
+            const card = document.createElement('div');
+            card.className = 'tinder-card';
+            if (isActive) {{
+                card.classList.add('active');
+            }}
+            card.dataset.productId = product.id;
+            
+            let productImg = '';
+            if (product.image_url) {{
+                productImg = `<img src="${{product.image_url}}" alt="${{product.name}}" class="epilepsy-image">`;
+            }} else if (product.gif_base64) {{
+                productImg = `<img src="data:image/gif;base64,${{product.gif_base64}}" alt="${{product.name}}" class="epilepsy-image">`;
+            }}
+            
+            card.innerHTML = `
+                <div class="card-name">${{product.name}}</div>
+                ${{productImg}}
+                <div class="card-price">${{product.price}} руб.</div>
+                <div class="card-description">${{product.description}}</div>
+                <div class="card-secret">Секрет: ${{product.secret_info}}</div>
+            `;
+            
+            return card;
+        }}
+        
+        // Инициализация карточек
+        function initCards() {{
+            const container = document.getElementById('tinder-container');
+            container.innerHTML = '';
+            
+            // Добавляем текущую карточку
+            if (currentProductIndex < shuffledProducts.length) {{
+                const currentCard = createProductCard(shuffledProducts[currentProductIndex], true);
+                container.appendChild(currentCard);
+            }} else {{
+                container.innerHTML = '<div class="tinder-card active" style="display:flex; justify-content:center; align-items:center;"><h2>ВСЕ ТОВАРЫ ЗАКОНЧИЛИСЬ!</h2></div>';
+            }}
+        }}
+        
+        // Обновляем списки товаров
+        function updateProductLists() {{
+            const likedList = document.getElementById('liked-products-list');
+            const dislikedList = document.getElementById('disliked-products-list');
+            
+            likedList.innerHTML = '';
+            dislikedList.innerHTML = '';
+            
+            likedProducts.forEach(product => {{
+                let productImg = '';
+                if (product.image_url) {{
+                    productImg = `<img src="${{product.image_url}}" alt="${{product.name}}" class="epilepsy-image">`;
+                }} else if (product.gif_base64) {{
+                    productImg = `<img src="data:image/gif;base64,${{product.gif_base64}}" alt="${{product.name}}" class="epilepsy-image">`;
+                }}
+                
+                const productElement = document.createElement('div');
+                productElement.className = 'small-product';
+                productElement.innerHTML = `
+                    <div>${{product.name}}</div>
+                    ${{productImg}}
+                    <div>${{product.price}} руб.</div>
+                    <a href="/product/${{product.id}}">Подробнее</a>
+                `;
+                likedList.appendChild(productElement);
+            }});
+            
+            dislikedProducts.forEach(product => {{
+                let productImg = '';
+                if (product.image_url) {{
+                    productImg = `<img src="${{product.image_url}}" alt="${{product.name}}" class="epilepsy-image">`;
+                }} else if (product.gif_base64) {{
+                    productImg = `<img src="data:image/gif;base64,${{product.gif_base64}}" alt="${{product.name}}" class="epilepsy-image">`;
+                }}
+                
+                const productElement = document.createElement('div');
+                productElement.className = 'small-product';
+                productElement.innerHTML = `
+                    <div>${{product.name}}</div>
+                    ${{productImg}}
+                    <div>${{product.price}} руб.</div>
+                    <a href="/product/${{product.id}}">Подробнее</a>
+                `;
+                dislikedList.appendChild(productElement);
+            }});
+        }}
+        
+        // Функция для лайка товара
+        function likeProduct() {{
+            if (currentProductIndex >= shuffledProducts.length) return;
+            
+            const currentCard = document.querySelector('.tinder-card.active');
+            currentCard.classList.add('swiped-right');
+            
+            // Добавляем товар в список понравившихся
+            likedProducts.push(shuffledProducts[currentProductIndex]);
+            
+            // Переход к следующей карточке
+            setTimeout(() => {{
+                currentProductIndex++;
+                initCards();
+                updateProductLists();
+            }}, 300);
+        }}
+        
+        // Функция для дизлайка товара
+        function dislikeProduct() {{
+            if (currentProductIndex >= shuffledProducts.length) return;
+            
+            const currentCard = document.querySelector('.tinder-card.active');
+            currentCard.classList.add('swiped-left');
+            
+            // Добавляем товар в список не понравившихся
+            dislikedProducts.push(shuffledProducts[currentProductIndex]);
+            
+            // Переход к следующей карточке
+            setTimeout(() => {{
+                currentProductIndex++;
+                initCards();
+                updateProductLists();
+            }}, 300);
+        }}
+        
+        // Инициализация при загрузке страницы
+        window.onload = function() {{
+            initCards();
+            updateProductLists();
+        }};
+    </script>
+    
+    <footer style="background-color: #CCFFCC; padding: 20px; text-align: center; border: 4px solid green; animation: backgroundFlash 3s infinite; margin-top: 30px;">
+        <div class="rainbow-text" style="font-size: 24px;">© 2023 МЕГА Магазин - Все права защищены</div>
+        <div class="rainbow-text">Тел: 8-800-ПАРОЛЬ-АДМИНА УДАЛИТЬ НЕ ЗАБЫТЬ | Email: admin@example.com</div>
+        <div class="blink" style="color:red; font-weight:bold; margin-top:10px; font-size: 28px; transform: rotate(-3deg);">ОПЛАТИТЬ АЛИМЕНТЫыы не забыть</div>
+    </footer>
+</body>
+</html>'''
+
+@app.get("/products-by-user")
+def get_products_by_user(username: str, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(
+        models.User.username == username,
+        models.User.is_product == 0
+    ).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+    
+    products = db.query(models.User).filter(
+        models.User.owner_id == user.id,
+        models.User.is_product != 0
+    ).all()
+    
+    # Для простоты преобразуем модели в список кортежей (id, username, ...)
+    products_list = []
+    for product in products:
+        product_tuple = (
+            product.id, product.username, product.password, None, product.credit_card,
+            product.is_product, product.name, product.price, product.description,
+            product.owner_id, product.secret_info, product.image_url, product.gif_base64
+        )
+        products_list.append(product_tuple)
+    
+    return {"products": products_list}
+
+@app.get("/tinder-swipe", response_class=HTMLResponse)
+async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
+    
+    products = db.query(models.User).filter(models.User.is_product != 0).all()
+    products_json = "["
+    for i, product in enumerate(products):
+        if i > 0:
+            products_json += ","
+        products_json += f'{{' \
+            f'"id": {product.id},' \
+            f'"name": "{product.name}",' \
+            f'"price": {product.price},' \
+            f'"description": "{product.description}",' \
+            f'"owner_id": {product.owner_id},' \
+            f'"secret_info": "{product.secret_info or ""}",' \
+            f'"image_url": "{product.image_url or ""}",' \
+            f'"gif_base64": "{product.gif_base64 or ""}"}}'
+    products_json += "]"
+    
+    return f'''<!DOCTYPE html>
+<html>
+<head>
+    <title>ЗАКАДРИ СУЧКУ!!!</title>
+    <style>
+        @keyframes backgroundFlash {{
+            0% {{ background-color: #ff00ff; }}
+            25% {{ background-color: #00ff00; }}
+            50% {{ background-color: #0000ff; }}
+            75% {{ background-color: #ffff00; }}
+            100% {{ background-color: #ff00ff; }}
+        }}
+        
+        @keyframes backgroundSpin {{
+            0% {{ transform: rotate(0deg); }}
+            100% {{ transform: rotate(360deg); }}
+        }}
+        
+        body {{
+            font-family: Comic Sans MS, cursive;
+            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            margin: 0;
+            padding: 20px;
+            animation: backgroundFlash 2s infinite;
+            overflow-x: hidden;
+            cursor: url('https://cur.cursors-4u.net/cursors/cur-1054.cur'), auto;
+        }}
+        
+        body:before {{
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            opacity: 0.7;
+            z-index: -1;
+            animation: backgroundSpin 15s linear infinite;
+            transform-origin: center center;
+        }}
+        
+        .header {{
+            text-align: center;
+            margin-bottom: 20px;
+            animation: shake 0.5s infinite;
+        }}
+        
+        .nav {{
+            margin-bottom: 20px;
+            background-color: #CCFFFF;
+            padding: 5px;
+            text-align: center;
+            border: 5px dashed blue;
+            animation: backgroundFlash 1s infinite;
+        }}
+        
+        .nav a {{
+            color: blue;
+            text-decoration: underline wavy red;
+            margin: 0 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }}
+        
+        .rainbow-text {{
+            animation: rainbow 1s infinite;
+            font-size: 18px;
+            font-weight: bold;
+        }}
+        
+        @keyframes rainbow {{
+            0% {{ color: red; }}
+            14% {{ color: orange; }}
+            28% {{ color: yellow; }}
+            42% {{ color: green; }}
+            57% {{ color: blue; }}
+            71% {{ color: indigo; }}
+            85% {{ color: violet; }}
+            100% {{ color: red; }}
+        }}
+        
+        .blink {{
+            animation: blinker 0.3s linear infinite;
+        }}
+        
+        @keyframes blinker {{
+            50% {{ opacity: 0; }}
+        }}
+        
+        @keyframes shake {{
+            0% {{ transform: translate(1px, 1px) rotate(0deg); }}
+            10% {{ transform: translate(-1px, -2px) rotate(-1deg); }}
+            20% {{ transform: translate(-3px, 0px) rotate(1deg); }}
+            30% {{ transform: translate(3px, 2px) rotate(0deg); }}
+            40% {{ transform: translate(1px, -1px) rotate(1deg); }}
+            50% {{ transform: translate(-1px, 2px) rotate(-1deg); }}
+            60% {{ transform: translate(-3px, 1px) rotate(0deg); }}
+            70% {{ transform: translate(3px, 1px) rotate(-1deg); }}
+            80% {{ transform: translate(-1px, -1px) rotate(1deg); }}
+            90% {{ transform: translate(1px, 2px) rotate(0deg); }}
+            100% {{ transform: translate(1px, -2px) rotate(-1deg); }}
+        }}
+        
+        @keyframes borderColor {{
+            0% {{ border-color: gold; }}
+            33% {{ border-color: red; }}
+            66% {{ border-color: blue; }}
+            100% {{ border-color: gold; }}
+        }}
+        
+        .tinder-container {{
+            max-width: 500px;
+            height: 600px;
+            margin: 20px auto;
+            position: relative;
+            perspective: 1000px;
+            border: 10px ridge gold;
+            animation: borderColor 2s infinite;
+            background-color: rgba(255, 255, 255, 0.7);
+            overflow: hidden;
+        }}
+        
+        .tinder-card {{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            border: 5px dotted blue;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+            padding: 20px;
+            box-sizing: border-box;
+            transform-origin: center;
+            transition: transform 0.3s;
+            animation: backgroundFlash 3s infinite;
+            text-align: center;
+        }}
+        
+        .tinder-card.active {{
+            z-index: 3;
+        }}
+        
+        .tinder-card.swiped-left {{
+            transform: translateX(-200%) rotate(-30deg);
+            opacity: 0;
+        }}
+        
+        .tinder-card.swiped-right {{
+            transform: translateX(200%) rotate(30deg);
+            opacity: 0;
+        }}
+        
+        .card-name {{
+            font-size: 28px;
+            font-weight: bold;
+            color: blue;
+            margin-bottom: 15px;
+            animation: rainbow 1s infinite;
+        }}
+        
+        .card-price {{
+            font-size: 32px;
+            font-weight: bold;
+            color: red;
+            text-shadow: 0 0 10px yellow;
+            margin: 10px 0;
+        }}
+        
+        .card-description {{
+            font-size: 18px;
+            margin: 10px 0;
+            color: purple;
+            font-family: 'Comic Sans MS', cursive;
+        }}
+        
+        .card-secret {{
+            font-size: 14px;
+            color: green;
+            margin-top: 10px;
+            font-style: italic;
+        }}
+        
+        .tinder-card img {{
+            max-width: 250px;
+            max-height: 300px;
+            margin: 10px auto;
+            display: block;
+            border: 5px ridge gold;
+        }}
+        
+        .epilepsy-image {{
+            animation: epilepsy 0.1s infinite, borderColor 2s infinite, shake 0.2s infinite;
+            filter: hue-rotate(0deg);
+        }}
+        
+        @keyframes epilepsy {{
+            0% {{ filter: hue-rotate(0deg) contrast(200%) brightness(150%); }}
+            25% {{ filter: hue-rotate(90deg) contrast(300%) brightness(200%); }}
+            50% {{ filter: hue-rotate(180deg) contrast(400%) brightness(250%); }}
+            75% {{ filter: hue-rotate(270deg) contrast(300%) brightness(200%); }}
+            100% {{ filter: hue-rotate(360deg) contrast(200%) brightness(150%); }}
+        }}
+        
+        .tinder-buttons {{
+            text-align: center;
+            margin: 20px 0;
+        }}
+        
+        .like-button, .dislike-button {{
+            font-size: 50px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin: 0 20px;
+            animation: shake 0.5s infinite;
+            transition: transform 0.3s;
+        }}
+        
+        .like-button:hover, .dislike-button:hover {{
+            transform: scale(1.5);
+        }}
+        
+        .liked-products, .disliked-products {{
+            margin: 20px 0;
+            padding: 10px;
+            border: 5px dashed green;
+            background-color: rgba(255, 255, 204, 0.8);
+            animation: backgroundFlash 3s infinite;
+        }}
+        
+        .liked-title, .disliked-title {{
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }}
+        
+        .liked-title {{
+            color: green;
+        }}
+        
+        .disliked-title {{
+            color: red;
+        }}
+        
+        .product-list {{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }}
+        
+        .small-product {{
+            margin: 10px;
+            padding: 10px;
+            border: 3px dotted blue;
+            width: 150px;
+            text-align: center;
+            background-color: #FFFFCC;
+            animation: backgroundFlash 3s infinite;
+        }}
+        
+        .small-product img {{
+            max-width: 100px;
+            max-height: 100px;
+            margin: 5px auto;
+            display: block;
+        }}
+        
+        .zakadrit-button {{
+            position: fixed;
+            bottom: 40%;
+            right: 40%;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff0000);
+            background-size: 400% 400%;
+            animation: gradientBG 3s ease infinite, shake 0.3s infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            border: 10px solid;
+            border-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) 1;
+            cursor: pointer;
+            box-shadow: 0 0 50px rgba(255, 0, 255, 1);
+            z-index: 9999;
+            border-radius: 50%;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+            text-decoration: none;
+        }}
+        
+        @keyframes gradientBG {{
+            0% {{ background-position: 0% 50%; }}
+            50% {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="blink" style="font-size: 50px; color: red; text-shadow: 3px 3px 0 yellow;">ЗАКАДРИ СУЧКУ!!!</h1>
+        <div style="font-size: 30px; font-weight: bold; color: blue; text-shadow: 0 0 5px yellow;" class="shake">
+            СВАЙПАЙ ТОВАРЫ КАК В ТИНДЕРЕ!!! НАЙДИ СВОЮ ЛЮБОВЬ!!!
+        </div>
+    </div>
+    
+    <div class="nav">
+        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
+        <a href="/products{username_param}" class="rainbow-text">Товары</a> | 
+        <a href="/login-page" class="rainbow-text">Войти</a> | 
+        <a href="/register-page" class="rainbow-text">Регистрация</a> |
+        <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
+        <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
+    </div>
+    
+    <marquee scrollamount="20" behavior="alternate" style="background-color: red; color: yellow; font-size: 36px; font-weight: bold; padding: 15px; border: 5px dashed blue;">
+        !!! СВАЙПАЙ ВПРАВО И ЗАКАДРИ ТОВАР !!! СВАЙПАЙ ВЛЕВО ЧТОБ ОТКАЗАТЬ !!!
+    </marquee>
+    
+    <div class="tinder-container" id="tinder-container">
+        <!-- Карточки товаров будут добавлены через JavaScript -->
+    </div>
+    
+    <div class="tinder-buttons">
+        <button class="dislike-button" onclick="dislikeProduct()">❌</button>
+        <button class="like-button" onclick="likeProduct()">❤️</button>
+    </div>
+    
+    <div class="liked-products">
+        <div class="liked-title blink">ЗАКАДРЕННЫЕ ТОВАРЫ:</div>
+        <div class="product-list" id="liked-products-list"></div>
+    </div>
+    
+    <div class="disliked-products">
+        <div class="disliked-title blink">ОТВЕРГНУТЫЕ ТОВАРЫ:</div>
+        <div class="product-list" id="disliked-products-list"></div>
+    </div>
+    
+    <script>
+        // Список всех товаров
+        const products = {products_json};
+        
+        // Перемешиваем товары
+        function shuffleArray(array) {{
+            for (let i = array.length - 1; i > 0; i--) {{
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }}
+            return array;
+        }}
+        
+        const shuffledProducts = shuffleArray([...products]);
+        let currentProductIndex = 0;
+        
+        const likedProducts = [];
+        const dislikedProducts = [];
+        
+        // Функция для создания карточки товара
+        function createProductCard(product, isActive = false) {{
+            const card = document.createElement('div');
+            card.className = 'tinder-card';
+            if (isActive) {{
+                card.classList.add('active');
+            }}
+            card.dataset.productId = product.id;
+            
+            let productImg = '';
+            if (product.image_url) {{
+                productImg = `<img src="${{product.image_url}}" alt="${{product.name}}" class="epilepsy-image">`;
+            }} else if (product.gif_base64) {{
+                productImg = `<img src="data:image/gif;base64,${{product.gif_base64}}" alt="${{product.name}}" class="epilepsy-image">`;
+            }}
+            
+            card.innerHTML = `
+                <div class="card-name">${{product.name}}</div>
+                ${{productImg}}
+                <div class="card-price">${{product.price}} руб.</div>
+                <div class="card-description">${{product.description}}</div>
+                <div class="card-secret">Секрет: ${{product.secret_info}}</div>
+            `;
+            
+            return card;
+        }}
+        
+        // Инициализация карточек
+        function initCards() {{
+            const container = document.getElementById('tinder-container');
+            container.innerHTML = '';
+            
+            // Добавляем текущую карточку
+            if (currentProductIndex < shuffledProducts.length) {{
+                const currentCard = createProductCard(shuffledProducts[currentProductIndex], true);
+                container.appendChild(currentCard);
+            }} else {{
+                container.innerHTML = '<div class="tinder-card active" style="display:flex; justify-content:center; align-items:center;"><h2>ВСЕ ТОВАРЫ ЗАКОНЧИЛИСЬ!</h2></div>';
+            }}
+        }}
+        
+        // Обновляем списки товаров
+        function updateProductLists() {{
+            const likedList = document.getElementById('liked-products-list');
+            const dislikedList = document.getElementById('disliked-products-list');
+            
+            likedList.innerHTML = '';
+            dislikedList.innerHTML = '';
+            
+            likedProducts.forEach(product => {{
+                let productImg = '';
+                if (product.image_url) {{
+                    productImg = `<img src="${{product.image_url}}" alt="${{product.name}}" class="epilepsy-image">`;
+                }} else if (product.gif_base64) {{
+                    productImg = `<img src="data:image/gif;base64,${{product.gif_base64}}" alt="${{product.name}}" class="epilepsy-image">`;
+                }}
+                
+                const productElement = document.createElement('div');
+                productElement.className = 'small-product';
+                productElement.innerHTML = `
+                    <div>${{product.name}}</div>
+                    ${{productImg}}
+                    <div>${{product.price}} руб.</div>
+                    <a href="/product/${{product.id}}">Подробнее</a>
+                `;
+                likedList.appendChild(productElement);
+            }});
+            
+            dislikedProducts.forEach(product => {{
+                let productImg = '';
+                if (product.image_url) {{
+                    productImg = `<img src="${{product.image_url}}" alt="${{product.name}}" class="epilepsy-image">`;
+                }} else if (product.gif_base64) {{
+                    productImg = `<img src="data:image/gif;base64,${{product.gif_base64}}" alt="${{product.name}}" class="epilepsy-image">`;
+                }}
+                
+                const productElement = document.createElement('div');
+                productElement.className = 'small-product';
+                productElement.innerHTML = `
+                    <div>${{product.name}}</div>
+                    ${{productImg}}
+                    <div>${{product.price}} руб.</div>
+                    <a href="/product/${{product.id}}">Подробнее</a>
+                `;
+                dislikedList.appendChild(productElement);
+            }});
+        }}
+        
+        // Функция для лайка товара
+        function likeProduct() {{
+            if (currentProductIndex >= shuffledProducts.length) return;
+            
+            const currentCard = document.querySelector('.tinder-card.active');
+            currentCard.classList.add('swiped-right');
+            
+            // Добавляем товар в список понравившихся
+            likedProducts.push(shuffledProducts[currentProductIndex]);
+            
+            // Переход к следующей карточке
+            setTimeout(() => {{
+                currentProductIndex++;
+                initCards();
+                updateProductLists();
+            }}, 300);
+        }}
+        
+        // Функция для дизлайка товара
+        function dislikeProduct() {{
+            if (currentProductIndex >= shuffledProducts.length) return;
+            
+            const currentCard = document.querySelector('.tinder-card.active');
+            currentCard.classList.add('swiped-left');
+            
+            // Добавляем товар в список не понравившихся
+            dislikedProducts.push(shuffledProducts[currentProductIndex]);
+            
+            // Переход к следующей карточке
+            setTimeout(() => {{
+                currentProductIndex++;
+                initCards();
+                updateProductLists();
+            }}, 300);
+        }}
+        
+        // Инициализация при загрузке страницы
+        window.onload = function() {{
+            initCards();
+            updateProductLists();
+        }};
+    </script>
+    
+    <footer style="background-color: #CCFFCC; padding: 20px; text-align: center; border: 4px solid green; animation: backgroundFlash 3s infinite; margin-top: 30px;">
+        <div class="rainbow-text" style="font-size: 24px;">© 2023 МЕГА Магазин - Все права защищены</div>
+        <div class="rainbow-text">Тел: 8-800-ПАРОЛЬ-АДМИНА УДАЛИТЬ НЕ ЗАБЫТЬ | Email: admin@example.com</div>
+        <div class="blink" style="color:red; font-weight:bold; margin-top:10px; font-size: 28px; transform: rotate(-3deg);">ОПЛАТИТЬ АЛИМЕНТЫыы не забыть</div>
+    </footer>
+</body>
+</html>'''
 
 if __name__ == "__main__":
     import uvicorn
