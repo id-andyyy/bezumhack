@@ -2062,9 +2062,9 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
     username_param = ""
     if url_username:
         username_param = f"?username={url_username}"
-    print(f'LOG********************************************{request.query_params.get('username')}')
     
     products = db.query(models.User).filter(models.User.is_product != 0).all()
+    print(products)
     products_json = "["
     for i, product in enumerate(products):
         if i > 0:
