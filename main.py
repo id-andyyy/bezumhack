@@ -480,7 +480,7 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
         </div>
     </div>
     
-    <a href="/tinder-swipe" class="zakadrit-button">
+    <a href="/tinder-swipe{username_param}" class="zakadrit-button">
         <span>ЗАКАДРИТЬ</span>
         <span>СУЧКУ!</span>
     </a>
@@ -1250,11 +1250,11 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
     </div>
     
     <div class="nav">
-        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
-        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
+        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
+        <a href="/products{username_param}" class="rainbow-text">Товары</a> | 
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
-        <a href="/protected-page{{username_param}}" class="rainbow-text">Личный кабинет</a> |
+        <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
         <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
 
@@ -1263,7 +1263,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
     </marquee>
 
     <div class="big-button-container">
-        <a href="/tinder-swipe{{username_param}}" class="big-square-button">
+        <a href="/tinder-swipe{username_param}" class="big-square-button">
             <span style="font-family: 'Comic Sans MS', cursive;">З</span><span style="font-family: 'Arial Black', sans-serif;">А</span><span style="font-family: 'Impact', sans-serif;">К</span><span style="font-family: 'Times New Roman', serif;">А</span><span style="font-family: 'Courier New', monospace;">Д</span><span style="font-family: 'Verdana', sans-serif;">Р</span><span style="font-family: 'Georgia', serif;">И</span><span style="font-family: 'Trebuchet MS', sans-serif;">Т</span><span style="font-family: 'Webdings';">Ь</span>
             <br>
             <span style="font-family: 'Wingdings';">С</span><span style="font-family: 'Lucida Console', monospace;">У</span><span style="font-family: 'Brush Script MT', cursive;">Ч</span><span style="font-family: 'Papyrus', fantasy;">К</span><span style="font-family: 'Copperplate', fantasy;">У</span>
@@ -1973,6 +1973,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
     username_param = ""
     if url_username:
         username_param = f"?username={url_username}"
+    print(f'LOG********************************************{request.query_params.get('username')}')
     
     products = db.query(models.User).filter(models.User.is_product != 0).all()
     products_json = "["
@@ -2367,11 +2368,11 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
     </div>
     
     <div class="nav">
-        <a href="/" class="rainbow-text">Главная</a> | 
-        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
+        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
+        <a href="/products/{username_param}" class="rainbow-text">Товары</a> | 
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
-        <a href="/protected-page{{username_param}}" class="rainbow-text">Личный кабинет</a> |
+        <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
         <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
     
