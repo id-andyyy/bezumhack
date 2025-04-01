@@ -1,0 +1,32 @@
+# Виртуальное окружение
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+
+# Данные и логи
+*.log
+*.sqlite
+*.db
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Докер
+.dockerignore
+docker-compose.yml
+
+# Другое
+README.md
+LICENSE
+*.md
