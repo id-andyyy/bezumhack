@@ -387,8 +387,8 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
         
         .zakadrit-button {{
             position: fixed;
-            bottom: 40%;
-            right: 40%;
+            bottom: 20px;
+            right: 20px;
             width: 400px;
             height: 400px;
             background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff0000);
@@ -2487,10 +2487,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
         <div class="product-list" id="disliked-products-list"></div>
     </div>
     
-    <a href="/products{{username_param}}" class="zakadrit-button">
-        <span>ЗАКАДРИТЬ</span>
-        <span>СУЧКУ!</span>
-    </a>
+    
     
     <script>
         // Список всех товаров
