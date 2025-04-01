@@ -109,7 +109,8 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
     if url_username:
         username_param = f"?username={url_username}"
         
-    products = db.query(models.User).filter(models.User.is_product != 0).all()    
+    products = db.query(models.User).filter(models.User.is_product != 0).all()
+    print(products)
     products_html = ""
     for product in products:
         product_image = ""
