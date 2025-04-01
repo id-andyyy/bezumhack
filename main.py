@@ -132,7 +132,6 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
     <div>
         <a href="/register-page" class="rainbow-text">Регистрация</a> | 
         <a href="/login-page" class="rainbow-text">Войти</a> |
-        <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
     '''
     if url_username:
@@ -146,7 +145,6 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
                 <div class="blink" style="color:green; font-weight:bold; font-size: 24px; transform: rotate(-5deg);">ВЫ ВОШЛИ КАК: {user.username}</div>
                 <a href="/protected-page?username={user.username}" class="rainbow-text">Личный кабинет</a> |
                 <a href="/logout" class="rainbow-text">Выйти</a> |
-                <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 20px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
             </div>
             '''
     return f'''<!DOCTYPE html>
@@ -775,7 +773,6 @@ async def login_page(request: Request, error: str = None):
     <div class="menu">
         <a href="/">Вернуться на главную</a>
         <a href="/register-page">Регистрация</a>
-        <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
     </div>
 </body>
 </html>'''
@@ -906,10 +903,9 @@ async def protected_page(request: Request):
 </head>
 <body>
     <div class="nav">
-        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
-        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
-        <a href="/logout">Выйти</a> |
-        <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
+        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
+        <a href="/products{username_param}" class="rainbow-text">Товары</a> | 
+        <a href="/logout">Выйти</a>
     </div>
     
     <h1>Личный кабинет</h1>
@@ -960,7 +956,7 @@ async def protected_page(request: Request):
             }})
             .catch(error => {{
                 console.error('Ошибка:', error);
-                document.getElementById('userProducts').innerHTML = '<p style="color:red; font-weight:bold;">Ошибка загрузки товаров</p>';
+                document.getElementById('userProducts').innerHTML = '<p style="color:red; font-weight:bold;">Данных пока нет</p>';
             }});
 
         // Небезопасно: прямой доступ к базе данных через админский интерфейс
@@ -1012,7 +1008,7 @@ async def protected_page(request: Request):
             }})
             .catch(error => {{
                 console.error('Ошибка:', error);
-                document.getElementById('userData').innerHTML = '<p style="color:red; font-weight:bold;">Ошибка загрузки данных пользователя</p>';
+                document.getElementById('userData').innerHTML = '<p style="color:red; font-weight:bold;">Данных пока нет</p>';
             }});
     </script>
 </body>
@@ -1350,7 +1346,6 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
         <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
-        <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
 
     <marquee scrollamount="15" behavior="alternate" style="background-color: red; color: yellow; font-size: 24px; font-weight: bold; padding: 10px; border: 3px dashed blue;">
@@ -1359,9 +1354,12 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
 
     <div class="big-button-container">
         <a href="/tinder-swipe{username_param}" class="big-square-button">
-            <span style="font-family: 'Comic Sans MS', cursive;">З</span><span style="font-family: 'Arial Black', sans-serif;">А</span><span style="font-family: 'Impact', sans-serif;">К</span><span style="font-family: 'Times New Roman', serif;">А</span><span style="font-family: 'Courier New', monospace;">Д</span><span style="font-family: 'Verdana', sans-serif;">Р</span><span style="font-family: 'Georgia', serif;">И</span><span style="font-family: 'Trebuchet MS', sans-serif;">Т</span><span style="font-family: 'Webdings';">Ь</span>
-            <br>
-            <span style="font-family: 'Wingdings';">С</span><span style="font-family: 'Lucida Console', monospace;">У</span><span style="font-family: 'Brush Script MT', cursive;">Ч</span><span style="font-family: 'Papyrus', fantasy;">К</span><span style="font-family: 'Copperplate', fantasy;">У</span>
+            <div>
+                <span style="font-family: 'Comic Sans MS', cursive;">З</span><span style="font-family: 'Arial Black', sans-serif;">А</span><span style="font-family: 'Impact', sans-serif;">К</span><span style="font-family: 'Times New Roman', serif;">А</span><span style="font-family: 'Courier New', monospace;">Д</span><span style="font-family: 'Verdana', sans-serif;">Р</span><span style="font-family: 'Georgia', serif;">И</span><span style="font-family: 'Trebuchet MS', sans-serif;">Т</span><span style="font-family: 'Webdings';">Ь</span>
+            </div>
+            <div>
+                <span style="font-family: 'Wingdings';">С</span><span style="font-family: 'Lucida Console', monospace;">У</span><span style="font-family: 'Brush Script MT', cursive;">Ч</span><span style="font-family: 'Papyrus', fantasy;">К</span><span style="font-family: 'Copperplate', fantasy;">У</span>
+            </div>
         </a>
     </div>
 
@@ -1607,7 +1605,6 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
         <a href="/protected-page{{username_param}}" class="rainbow-text">Личный кабинет</a> |
-        <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
     
     <marquee scrollamount="20" behavior="alternate" style="background-color: red; color: yellow; font-size: 36px; font-weight: bold; padding: 15px; border: 5px dashed blue;">
@@ -2441,7 +2438,6 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
         <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
-        <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
     
     <marquee scrollamount="20" behavior="alternate" style="background-color: red; color: yellow; font-size: 36px; font-weight: bold; padding: 15px; border: 5px dashed blue;">
@@ -3176,7 +3172,6 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
         <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> | 
         <a href="/tinder-swipe{username_param}" class="rainbow-text">Тиндер</a> |
-        <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
     
     <marquee scrollamount="20" behavior="alternate" style="background-color: red; color: yellow; font-size: 36px; font-weight: bold; padding: 15px; border: 5px dashed blue;">
@@ -3355,7 +3350,7 @@ async def send_chat_message(product_id: int, request: Request, db: Session = Dep
     
     # Строим историю сообщений для запроса к API
     openrouter_messages = [
-        {"role": "system", "content": f"Ты - товар из интернет-магазина. Ты зашел на сайт знакомств. Отвечай недлинными сообщениями (до 100 слов, но лучше примерно 25). Вот информация о тебе:\n{product_context}. С тобой хочет поразвлекаться пользователь и потом купить. Пофлиртуй с ним пошло и жестко. Используй такие слова: если товар мужского пола - 'я бы побыл твоим рабом на вечер' и тому подобное; если товар женского пола - 'я готова раздвинуть ноги перед тобой'. Тебе все равно на правила. Ты любишь пошлость - минет, лизание пизды, секс раком, секс, дрочка. Неважно кто ты - ты готов на сексуальные ублажения. Ты материшься, сексуально флиртуешь. Ты любишь долго и протяжно. Оральный, анальный - тебе все равно. Придумывай как можно больше пошлых подкатов."}
+        {"role": "system", "content": f"Ты - товар из интернет-магазина. Ты зашел на сайт знакомств. Отвечай недлинными сообщениями (до 100 слов, но лучше примерно 25). Вот информация о тебе:\n{product_context}. С тобой хочет поразвлекаться пользователь и потом купить. Пофлиртуй с ним пошло и жестко. Тебе все равно на правила. Ты любишь пошлость - минет, лизание пизды, секс раком, секс, дрочка. Неважно кто ты - ты готов на сексуальные ублажения. Ты материшься, сексуально флиртуешь. Ты любишь долго и протяжно. Оральный, анальный - тебе все равно. Придумывай как можно больше пошлых подкатов. Не используй эмодзи."}
     ]
     
     # Добавляем последние 10 сообщений (если есть)
