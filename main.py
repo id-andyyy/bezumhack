@@ -2303,8 +2303,8 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
     </div>
     
     <div class="nav">
-        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
-        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
+        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
+        <a href="/products{username_param}" class="rainbow-text">Товары</a> | 
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
         <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
