@@ -154,6 +154,12 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
     <meta charset="UTF-8">
     <title>СУПЕР МАГАЗИН 2000!!!</title>
     <style>
+        html, body {{
+            height: 100vh;
+            max-height: 100vh;
+            min-height: 100vh;
+            overflow-y: auto;
+        }}
         @keyframes backgroundFlash {{
             0% {{ background-color: #ff00ff; }}
             25% {{ background-color: #00ff00; }}
@@ -467,6 +473,87 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
     <div style="margin-top:10px;">
         <div class="category">НАШИ СУПЕР ТОВАРЫ!!! <span class="blink">КУПИ СЕЙЧАС!!!!</span></div>
         <div style="display:flex; flex-wrap:wrap; justify-content:space-between;">
+            <style>
+                .item {{
+                    animation: bounce 5s infinite linear;
+                    position: fixed; /* Изменили с absolute на fixed */
+                    z-index: 1000;
+                    transition: all 0.1s ease;
+                }}
+                
+                @keyframes bounce {{
+                    from {{
+                        transform: translate(0, 0);
+                    }}
+                }}
+
+                .item:hover {{
+                    z-index: 1001;
+                }}
+            </style>
+            <script>
+                function getRandomDirection() {{
+                    return (Math.random() - 0.5) * 100;
+                }}
+
+                function bounceItems() {{
+                    const items = document.querySelectorAll('.item');
+                    const pageHeight = Math.max(
+                        document.body.scrollHeight,
+                        document.documentElement.scrollHeight
+                    );
+                    
+                    items.forEach(item => {{
+                        if (!item.dx) {{
+                            item.dx = getRandomDirection();
+                            item.dy = getRandomDirection();
+                            item.style.left = Math.random() * (window.innerWidth - item.offsetWidth) + 'px';
+                            item.style.top = Math.random() * (window.innerHeight - item.offsetHeight) + 'px';
+                        }}
+
+                        const rect = item.getBoundingClientRect();
+                        let newLeft = rect.left + item.dx;
+                        let newTop = rect.top + item.dy;
+
+                        if (newLeft <= 0) {{
+                            newLeft = 0;
+                            item.dx = Math.abs(item.dx);
+                        }}
+                        if (newLeft + rect.width >= window.innerWidth) {{
+                            newLeft = window.innerWidth - rect.width;
+                            item.dx = -Math.abs(item.dx);
+                        }}
+
+                        if (newTop <= 0) {{
+                            newTop = 0;
+                            item.dy = Math.abs(item.dy);
+                        }}
+                        if (newTop + rect.height >= window.innerHeight) {{
+                            newTop = window.innerHeight - rect.height;
+                            item.dy = -Math.abs(item.dy);
+                        }}
+
+                        item.style.left = newLeft + 'px';
+                        item.style.top = newTop + 'px';
+                    }});
+                }}
+
+                setInterval(bounceItems, 16);
+
+                window.addEventListener('resize', () => {{
+                    const items = document.querySelectorAll('.item');
+                    
+                    items.forEach(item => {{
+                        const rect = item.getBoundingClientRect();
+                        if (rect.right > window.innerWidth) {{
+                            item.style.left = (window.innerWidth - rect.width) + 'px';
+                        }}
+                        if (rect.bottom > window.innerHeight) {{
+                            item.style.top = (window.innerHeight - rect.height) + 'px';
+                        }}
+                    }});
+                }});
+            </script>
             {products_html}
         </div>
     </div>
