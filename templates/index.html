@@ -2,19 +2,530 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главная страница</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+    <title>СУПЕР МАГАЗИН 2000!!!</title>
+    <style>
+        body {
+            font-family: Comic Sans MS, cursive;
+            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
+            margin: 0;
+            padding: 5px;
+            cursor: url('https://cur.cursors-4u.net/cursors/cur-11/cur1054.cur'), auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        td {
+            vertical-align: top;
+            padding: 0px;
+        }
+        
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            color: #FF00FF;
+            text-shadow: 3px 3px 0 yellow, -3px -3px 0 lime;
+            font-family: "Impact", fantasy;
+        }
+        
+        .category {
+            background-color: red;
+            color: yellow;
+            font-weight: bold;
+            padding: 2px;
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 3px;
+            border: 3px dashed blue;
+        }
+        
+        .item {
+            border: 2px dotted purple;
+            padding: 2px;
+            text-align: center;
+            background-color: #FFFFCC;
+            margin-bottom: 3px;
+            margin-right: 3px;
+            box-sizing: border-box;
+        }
+        
+        .item img {
+            max-width: 100%;
+            height: auto;
+            border: 3px ridge gold;
+        }
+        
+        .item-title {
+            font-weight: bold;
+            margin: 2px 0;
+            color: blue;
+            text-decoration: underline;
+        }
+        
+        .item-price {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        
+        .label {
+            background-color: yellow;
+            color: black;
+            padding: 1px 3px;
+            font-weight: bold;
+            display: inline-block;
+            transform: rotate(-5deg);
+        }
+        
+        .highlight {
+            border: 4px solid red;
+            background-color: #CCFFFF;
+        }
+        
+        .nav-item {
+            color: blue;
+            text-decoration: underline;
+            margin: 0 3px;
+        }
+        
+        .search {
+            margin: 3px 0;
+        }
+        
+        .search input {
+            margin-right: 2px;
+            background-color: #CCFFCC;
+        }
+        
+        .random-color1 {
+            background-color: #e1f0e5;
+        }
+        
+        .random-color2 {
+            background-color: #f0e5e1;
+        }
+        
+        .random-color3 {
+            background-color: #e1e5f0;
+        }
+        
+        .left-align {
+            text-align: left;
+        }
+        
+        .red-text {
+            color: red;
+        }
+        
+        .blue-bg {
+            background-color: #dde5ff;
+        }
+        
+        .blink {
+            animation: blinker 0.8s linear infinite;
+        }
+        
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+        
+        .rotate {
+            animation: rotation 2s infinite linear;
+            display: inline-block;
+        }
+        
+        @keyframes rotation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(359deg); }
+        }
+        
+        .rainbow-text {
+            background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+            -webkit-background-clip: text;
+            color: transparent;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: "Comic Sans MS", cursive;
+        }
+        
+        .marquee {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            background-color: black;
+            color: white;
+            font-size: 16px;
+            padding: 5px 0;
+        }
+        
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 15s linear infinite;
+        }
+        
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .wobble {
+            animation: wobble 2s infinite;
+            display: inline-block;
+        }
+        
+        @keyframes wobble {
+            0% { transform: translateX(0%); }
+            15% { transform: translateX(-5%) rotate(-5deg); }
+            30% { transform: translateX(4%) rotate(3deg); }
+            45% { transform: translateX(-3%) rotate(-3deg); }
+            60% { transform: translateX(2%) rotate(2deg); }
+            75% { transform: translateX(-1%) rotate(-1deg); }
+            100% { transform: translateX(0%); }
+        }
+        
+        .comic-font { font-family: "Comic Sans MS", cursive; font-size: 12px; }
+        .times-font { font-family: "Times New Roman", serif; font-size: 14px; }
+        .impact-font { font-family: "Impact", fantasy; font-size: 15px; }
+        .courier-font { font-family: "Courier New", monospace; font-size: 11px; }
+        .arial-font { font-family: Arial, sans-serif; font-size: 13px; }
+        
+        .bg-yellow { background-color: yellow; }
+        .bg-lime { background-color: lime; }
+        .bg-cyan { background-color: cyan; }
+        .bg-magenta { background-color: magenta; color: white; }
+        .bg-orange { background-color: orange; }
+        
+        .border-blink {
+            animation: borderBlink 1s infinite;
+        }
+        
+        @keyframes borderBlink {
+            0% { border-color: red; }
+            33% { border-color: blue; }
+            66% { border-color: green; }
+            100% { border-color: red; }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Добро пожаловать!</h1>
-        <p style="text-align: center; margin-bottom: 20px;">Простое приложение с регистрацией и авторизацией</p>
-        
-        <div class="menu">
-            <a href="/register-page">Регистрация</a>
-            <a href="/login-page">Вход</a>
+    <div class="marquee">
+        <div class="marquee-content">
+            !!! СУПЕР ПРЕДЛОЖЕНИЯ !!! СКИДКА 90% НА ВСЕ ТОВАРЫ !!! ТОЛЬКО СЕГОДНЯ !!! ДОСТАВКА БЕСПЛАТНО !!! ЗВОНИТЕ ПРЯМО СЕЙЧАС !!! НЕВЕРОЯТНЫЕ ЦЕНЫ !!! КОЛИЧЕСТВО ОГРАНИЧЕНО !!!
         </div>
     </div>
+    
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td width="20%" valign="top">
+                <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Лого" style="float:left; margin-right:5px; width:80px; height:80px;">
+                <div class="logo">МЕГАмагазин<span class="blink">!!!</span></div>
+            </td>
+            <td width="50%" align="center">
+                <img src="https://web.archive.org/web/20090830181814/http://geocities.com/ResearchTriangle/Campus/5288/worknew.gif" alt="Under Construction" style="height:40px;">
+                <img src="https://web.archive.org/web/20090830155058/http://www.geocities.com/Hollywood/Hills/5342/NEON.GIF" alt="Баннер" style="height:40px;">
+                <img src="https://web.archive.org/web/20090831135837/http://www.geocities.com/Heartland/Pointe/9753/fire.gif" alt="Fire" style="height:40px;">
+            </td>
+            <td width="30%" align="right">
+                <div class="search">
+                    <input type="text" placeholder="Поиск товаров..." size="15">
+                    <button style="background-color: lime; font-weight: bold;">Найти!</button>
+                    <div class="blink" style="font-size:16px; color:red; font-weight:bold; margin-top:5px;">
+                        <span class="rotate">★</span> ПОИСК <span class="rotate">★</span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    
+    <table cellpadding="0" cellspacing="0" border="0" style="margin-top:2px;">
+        <tr>
+            <td bgcolor="#00FFFF" style="padding:3px;">
+                <span class="nav-item impact-font">ГЛАВНАЯ</span> |
+                <span class="nav-item comic-font">Дети</span> |
+                <span class="nav-item times-font">ЭЛЕКТРОНИКА</span> |
+                <span class="nav-item" style="font-size:16px; font-family:fantasy;">ИГРУШКИ</span> |
+                <span class="nav-item blink" style="color: red; font-size:14px; font-weight:bold;">РАСПРОДАЖА</span> |
+                <span class="nav-item courier-font">Контакты</span>
+            </td>
+        </tr>
+    </table>
+    
+    <!-- Хаотичное размещение товаров -->
+    <table border="0" cellpadding="0" cellspacing="0" style="margin-top:2px;">
+        <tr>
+            <td style="width:20%;">
+                <div class="item highlight border-blink" style="width:95%;">
+                    <img src="https://picsum.photos/id/684/110/80" alt="Товар">
+                    <div class="item-title blink" style="font-size:14px; font-family:Impact;">Электро-скутер</div>
+                    <div class="item-price wobble" style="font-size:16px;">от 29.990 руб.</div>
+                    <img src="https://web.archive.org/web/20091027005503/http://hk.geocities.com/bioniclegocn/gifs/new01.gif" alt="New" style="width:40px; position:absolute; top:0; right:0;">
+                </div>
+                
+                <div class="item bg-lime" style="width:95%;">
+                    <div class="category">ТРАНСПОРТ</div>
+                    <img src="https://media.giphy.com/media/cOVeNrpdyQM1qtFALW/giphy.gif" alt="Транспорт" style="width:110px; height:65px;">
+                    <div class="item-title" style="font-size:11px; font-family:'Comic Sans MS';">Электро-ATV для супер-героев</div>
+                    <div class="item-price" style="font-size:18px; font-family:monospace;">от 19.990 руб.</div>
+                </div>
+            </td>
+            
+            <td style="width:20%;">
+                <div class="category blink" style="background-color:#FF00FF; color:white;">ЭЛЕКТРОНИКА</div>
+                <div class="item" style="width:95%; height:80px; background-color:#e0ffe0;">
+                    <img src="https://media.giphy.com/media/jUNvjJ1xKj50rrDcTl/giphy.gif" alt="Дрон" style="width:110px; height:60px;">
+                    <div class="item-title rainbow-text" style="font-size:13px;">Дрон с камерой HD</div>
+                    <div class="item-price" style="font-size:16px; font-family:'Times New Roman';">12.500 руб.</div>
+                    <div class="label blink" style="background-color:red; color:white;">Хит!</div>
+                </div>
+                
+                <div class="item highlight" style="width:95%; border:3px dashed green;">
+                    <img src="https://picsum.photos/id/177/110/70" alt="Колонка">
+                    <div class="item-title wobble" style="font-size:15px; color:#FF00FF; font-family:Georgia;">Мегабас-3000</div>
+                    <div class="item-price blink" style="font-size:14px;">1.790 руб.</div>
+                </div>
+            </td>
+            
+            <td style="width:20%;">
+                <div class="item blue-bg" style="width:95%;">
+                    <img src="https://media.giphy.com/media/13UoiCY2pJSwZW/giphy.gif" alt="Камера">
+                    <div class="item-title" style="font-size:17px; font-family:Arial;">IP-камера Wi-Fi</div>
+                    <div class="item-price" style="font-size:12px; color:green;">2.790 руб.</div>
+                </div>
+                
+                <div class="item bg-orange" style="width:47%; display:inline-block;">
+                    <img src="https://picsum.photos/id/365/50/40" alt="Пульт">
+                    <div class="item-title" style="font-size:10px; font-family:Tahoma;">Мини-пульт</div>
+                    <div class="item-price" style="font-size:13px; color:blue;">590 руб.</div>
+                </div>
+                
+                <div class="item bg-cyan" style="width:47%; display:inline-block;">
+                    <img src="https://picsum.photos/id/399/50/40" alt="Лампа">
+                    <div class="item-title comic-font">LED-лампа</div>
+                    <div class="item-price" style="font-size:9px; color:maroon;">490 руб.</div>
+                </div>
+                
+                <div class="category random-color1 blink" style="font-family:Impact;">ИГРУШКИ ДЕТЯМ</div>
+            </td>
+            
+            <td style="width:20%;">
+                <table border="2" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffccff" style="border-color:purple;">
+                    <tr>
+                        <td width="50%">
+                            <div class="item" style="width:95%; background-color:#ffffaa;">
+                                <img src="https://media.giphy.com/media/1JLHYAYYmJEQ07TiGO/giphy.gif" alt="Робот" style="width:60px; height:40px;">
+                                <div class="item-title arial-font">Робот-трансформер</div>
+                                <div class="item-price impact-font">2.590 руб.</div>
+                            </div>
+                        </td>
+                        <td width="50%">
+                            <div class="item highlight" style="width:95%; background-color:#ffaaaa;">
+                                <img src="https://media.giphy.com/media/xTiTnm8AGoS75Cvyko/giphy.gif" alt="Квадрокоптер" style="width:60px; height:40px;">
+                                <div class="item-title courier-font blink">Квадрокоптер</div>
+                                <div class="item-price" style="font-size:11px; font-weight:bold; color:darkgreen;">1.990 руб.</div>
+                                <div class="label wobble" style="background-color:#FF00FF; color:yellow;">Новинка!</div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                
+                <div class="item" style="width:98%; margin-top:5px; background-color:#aaffaa;">
+                    <img src="https://picsum.photos/id/146/130/70" alt="Велосипед">
+                    <div class="item-title rainbow-text" style="font-size:16px;">Электро-велосипед TURBO</div>
+                    <div class="item-price" style="font-size:18px; font-family:'Courier New'; color:#CC0000;">49.990 руб.</div>
+                </div>
+            </td>
+            
+            <td style="width:20%;">
+                <div class="category random-color2" style="font-family:'Times New Roman'; text-transform:uppercase;">ДИСКОТЕКА</div>
+                <div class="item" style="width:95%; background-image:linear-gradient(to right, red, yellow);">
+                    <img src="https://media.giphy.com/media/3o85xJm1Rh6pISHhks/giphy.gif" alt="Диско-шар" style="width:110px; height:60px;">
+                    <div class="item-title wobble" style="font-size:14px; color:blue; font-family:fantasy;">Диско-шар LED</div>
+                    <div class="item-price" style="font-size:13px; font-family:'Comic Sans MS'; color:darkred;">1.290 руб.</div>
+                </div>
+                
+                <div class="item" style="width:95%; border:3px ridge blue;">
+                    <img src="https://picsum.photos/id/251/110/60" alt="Наушники">
+                    <div class="item-title" style="font-size:12px; font-family:Georgia;">Bluetooth-наушники</div>
+                    <div class="item-price blink" style="font-size:16px; color:purple;">990 руб.</div>
+                    <div class="label" style="transform:rotate(5deg); background-color:black; color:white;">Бас-бум!</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    
+    <div style="text-align:center; margin:5px 0;">
+        <img src="https://web.archive.org/web/20091027143037/http://geocities.com/ResearchTriangle/Campus/3583/rainbow.gif" width="100%" height="15" alt="Rainbow">
+    </div>
+    
+    <table border="0" cellpadding="0" cellspacing="0" style="margin-top:2px;">
+        <tr>
+            <td style="width:15%;">
+                <div class="category" style="background-color:darkblue; font-family:fantasy;">
+                    <img src="https://web.archive.org/web/20091020195337/http://www.geocities.com/Area51/Corridor/6872/myanim.gif" alt="Анимация" style="width:20px; height:20px; vertical-align:middle;"> 
+                    РОБОТЫ
+                </div>
+                <div class="item highlight" style="width:98%; background-color:#ddffdd;">
+                    <img src="https://media.giphy.com/media/11ZXft8S7sGRuo/giphy.gif" alt="Танк" style="width:100px; height:60px;">
+                    <div class="item-title impact-font" style="color:darkred;">Танк-убийца на радиоуправлении</div>
+                    <div class="item-price wobble" style="font-size:14px;">2.990 руб.</div>
+                </div>
+            </td>
+            
+            <td style="width:15%;">
+                <div class="item" style="width:98%; border:2px dashed orange; background-color:#eeffff;">
+                    <img src="https://media.giphy.com/media/10h1nQcTZjUgCI/giphy.gif" alt="Робот-пылесос" style="width:100px; height:60px;">
+                    <div class="item-title times-font">Робот-пылесос "Умник"</div>
+                    <div class="item-price rainbow-text">от 12.990 руб.</div>
+                </div>
+            </td>
+            
+            <td style="width:15%;">
+                <div class="category random-color3 blink" style="font-size:18px; font-family:monospace;">АВТО</div>
+                <div class="item" style="width:98%; background-color:#ffdddd;">
+                    <img src="https://picsum.photos/id/1076/100/70" alt="Электромобиль">
+                    <div class="item-title rainbow-text">Электромобиль 4x4</div>
+                    <div class="item-price" style="font-size:17px; font-family:'Impact'; color:#EE0000;">от 99.990 руб.</div>
+                </div>
+            </td>
+            
+            <td style="width:25%;">
+                <div class="item highlight" style="width:98%; border:5px groove gold; background-color:#f5f5f5;">
+                    <img src="https://media.giphy.com/media/lrAG3NdQJMtXclBMm4/giphy.gif" alt="Электрокар" style="width:180px; height:90px;">
+                    <div class="item-title blink" style="font-size:18px; font-family:Impact; color:#0000FF;">Мини электрокар TURBO</div>
+                    <div class="item-price wobble" style="font-size:16px; color:red;">39.990 руб.</div>
+                    <div class="label" style="background-color:red; color:white; font-size:14px; transform:rotate(-10deg);">Топ продаж!</div>
+                </div>
+            </td>
+            
+            <td style="width:15%;">
+                <div class="item bg-yellow" style="width:98%;">
+                    <img src="https://picsum.photos/id/1075/100/60" alt="Багги">
+                    <div class="item-title comic-font">Багги электрический "Молния"</div>
+                    <div class="item-price" style="font-size:14px; font-family:Georgia;">от 59.990 руб.</div>
+                    <div class="label blink" style="background-color:green; color:white;">Новинка!</div>
+                </div>
+            </td>
+            
+            <td style="width:15%;">
+                <div class="item bg-magenta" style="width:98%;">
+                    <img src="https://media.giphy.com/media/xT8qB8cBMJeUufwlgI/giphy.gif" alt="Смарт-часы" style="width:100px; height:60px;">
+                    <div class="item-title times-font" style="color:yellow;">Смарт-часы "Шпион-8000"</div>
+                    <div class="item-price blink" style="font-size:15px; color:lime;">от 3.490 руб.</div>
+                    <div class="label wobble" style="background-color:black; color:white;">Топ!</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    
+    <div style="text-align:center; margin:5px 0;">
+        <img src="https://web.archive.org/web/20091027110214/http://www.geocities.com/Tokyo/1474/rainline.gif" width="100%" height="20" alt="Rainbow line">
+    </div>
+    
+    <table border="0" cellpadding="0" cellspacing="0" style="margin-top:2px;">
+        <tr>
+            <td style="width:20%;">
+                <div class="item blue-bg border-blink" style="width:98%;">
+                    <img src="https://media.giphy.com/media/Jq89FlQtYO0N4M27Gy/giphy.gif" alt="3D-принтер" style="width:120px; height:70px;">
+                    <div class="item-title impact-font">3D-принтер СУПЕР-МИНИ</div>
+                    <div class="item-price blink" style="font-size:16px; font-family:'Courier New';">от 22.990 руб.</div>
+                </div>
+            </td>
+            
+            <td style="width:20%;">
+                <div class="item" style="width:48%; display:inline-block; background-color:#ffeeaa;">
+                    <img src="https://picsum.photos/id/75/50/40" alt="Фонарик">
+                    <div class="item-title" style="font-size:9px; font-family:'Times New Roman';">Фонарик LED</div>
+                    <div class="item-price" style="font-size:11px; color:darkgreen;">390 руб.</div>
+                </div>
+                
+                <div class="item" style="width:48%; display:inline-block; background-color:#aaeeff;">
+                    <img src="https://picsum.photos/id/96/50/40" alt="Брелок">
+                    <div class="item-title" style="font-size:10px; font-family:fantasy;">Брелок-GPS</div>
+                    <div class="item-price" style="font-size:12px; color:purple;">1.290 руб.</div>
+                </div>
+                
+                <div class="item bg-orange" style="width:98%;">
+                    <img src="https://media.giphy.com/media/l0K42u9hCg0x6XbLa/giphy.gif" alt="Планшет" style="width:120px; height:60px;">
+                    <div class="item-title wobble" style="font-size:14px; font-family:'Comic Sans MS'; color:blue;">Детский планшет "УЧИСЬ-КА"</div>
+                    <div class="item-price rainbow-text">3.990 руб.</div>
+                    <div class="label blink" style="background-color:red; color:white;">Хит!</div>
+                </div>
+            </td>
+            
+            <td style="width:20%;">
+                <div class="category red-text" style="background-color:yellow; font-size:20px; font-family:Impact; border:3px solid red;">
+                    <span class="blink">СУПЕР ПРЕДЛОЖЕНИЕ!</span>
+                </div>
+                <div class="item highlight" style="width:98%; border:4px solid red; background-color:#ffeeff;">
+                    <img src="https://media.giphy.com/media/NUsKTcvSA9x92/giphy.gif" alt="Самокат" style="width:120px; height:85px;">
+                    <div class="item-title blink" style="font-size:16px; font-family:fantasy; color:blue;">Электрический самокат "МОЛНИЯ"</div>
+                    <div class="item-price red-text" style="font-size:20px; font-weight:bold; font-family:Impact;">от 16.990 руб.</div>
+                    <img src="https://web.archive.org/web/20091027110706/http://www.geocities.com/area51/nebula/8380/HOT05.GIF" alt="Hot" style="position:absolute; bottom:0; right:0; width:50px;">
+                </div>
+            </td>
+            
+            <td style="width:20%;">
+                <div class="item" style="width:98%; background-color:#ddffdd; border:2px solid green;">
+                    <img src="https://picsum.photos/id/301/120/60" alt="Вертолет">
+                    <div class="item-title" style="font-size:13px; font-family:'Arial'; color:darkblue;">Радиоуправляемый вертолет "СОКОЛ"</div>
+                    <div class="item-price wobble" style="font-size:15px; color:darkred;">3.990 руб.</div>
+                </div>
+                
+                <div class="item" style="width:98%; background-color:#ddddff;">
+                    <img src="https://picsum.photos/id/167/120/50" alt="Змей">
+                    <div class="item-title courier-font">Воздушный змей "ДРАКОН"</div>
+                    <div class="item-price blink" style="font-size:14px; color:darkgreen;">590 руб.</div>
+                </div>
+            </td>
+            
+            <td style="width:20%;">
+                <div class="item" style="width:98%; background-color:#ffdddd; border:3px dotted blue;">
+                    <img src="https://media.giphy.com/media/RhTbfLBbzYxag5h0ay/giphy.gif" alt="Карт" style="width:120px; height:60px;">
+                    <div class="item-title rainbow-text" style="font-size:14px;">Двухместный карт "ФОРМУЛА"</div>
+                    <div class="item-price times-font" style="color:red;">от 29.990 руб.</div>
+                </div>
+                
+                <div class="item" style="width:98%; background-color:#eeffee;">
+                    <img src="https://picsum.photos/id/155/120/60" alt="Детский электромобиль">
+                    <div class="item-title impact-font" style="color:darkblue;">Детский электромобиль "ДЖИП"</div>
+                    <div class="item-price blink" style="font-size:15px; color:maroon;">от 15.890 руб.</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    
+    <div style="text-align:center; margin:10px 0;">
+        <img src="https://web.archive.org/web/20090901022301/http://geocities.com/littleme2272002/rainbowline_white.gif" width="100%" height="20" alt="Rainbow line">
+    </div>
+    
+    <table width="100%" style="margin-top: 5px; background-color:#AAEEFF; border:3px ridge blue;">
+        <tr>
+            <td width="33%">
+                <div class="search" style="text-align:center;">
+                    <input type="text" placeholder="Быстрый поиск..." style="background-color:yellow; font-family:'Comic Sans MS';">
+                    <button style="background-color:lime; font-weight:bold; font-family:Impact;">Искать!</button>
+                    <div class="blink" style="color:red; font-size:12px; margin-top:3px; font-family:'Comic Sans MS';">Найди самые лучшие цены!</div>
+                </div>
+            </td>
+            <td width="34%" align="center">
+                <span class="nav-item wobble" style="font-size:16px; font-family:fantasy;">Контакты</span> |
+                <span class="nav-item" style="font-size:14px; font-family:'Times New Roman';">Доставка</span> |
+                <span class="nav-item blink" style="font-size:15px; font-family:'Comic Sans MS'; color:red;">Оплата</span>
+            </td>
+            <td width="33%" align="right">
+                <span class="nav-item" style="font-size:14px; font-family:Arial;">О нас</span> |
+                <span class="nav-item rainbow-text">Партнерам</span>
+                <img src="https://web.archive.org/web/20091021051207/http://geocities.com/SunsetStrip/Disco/7454/mailme.gif" width="40" height="30" alt="Mail me">
+            </td>
+        </tr>
+    </table>
+    
+    <div style="text-align:center; margin-top:10px; font-family:'Comic Sans MS'; font-size:12px; color:#666;">
+        <div>© 2023 СУПЕР МАГАЗИН - Все права защищены</div>
+        <div style="font-size:10px; margin-top:3px;">Лучше просматривать в Internet Explorer 5.0 с разрешением 800x600</div>
+        <div class="blink" style="color:red; margin-top:5px;">Счетчик посещений: <span style="font-weight:bold; font-family:monospace;">1337</span></div>
+        <img src="https://web.archive.org/web/20090831075539/http://geocities.com/resinmonger/madecntr.gif" alt="Counter" style="margin-top:5px; width:90px;">
+    </div>
 </body>
-</html>
+</html> 
