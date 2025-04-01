@@ -339,7 +339,7 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
         }}
         
         .rotate {{
-            animation: rotation 1s infinite linear;
+            animation: rotation 3s infinite linear;
             display: inline-block;
         }}
         
@@ -427,6 +427,31 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
     </style>
 </head>
 <body>
+
+    <div id="splashScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; z-index: 10000; display: flex; justify-content: center; align-items: center;">
+        <img src="/static/logo.png" alt="Логотип" style="max-width: 80%; max-height: 80%; animation: pulse 0.7s infinite alternate;">
+    </div>
+    
+    <script>
+        // Добавляем стиль для пульсации
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes pulse {{
+                0% {{ transform: scale(1); }}
+                100% {{ transform: scale(2); }}
+            }}
+        `;
+        document.head.appendChild(style);
+        
+        // Скрываем заставку через 2 секунды
+        setTimeout(function() {{
+            const splashScreen = document.getElementById('splashScreen');
+            if (splashScreen) {{
+                splashScreen.style.display = 'none';
+            }}
+        }}, 1500);
+    </script>
+
     <div class="marquee">
         <div class="marquee-content">
             !!! ТОВАРЫ БЕЗ РЕГИСТРАЦИИ И СМС !!! СКИДКА 90% НА ВСЕ ТОВАРЫ !!! ТОЛЬКО СЕГОДНЯ !!! ДОСТАВКА БЕСПЛАТНО !!! ЗВОНИТЕ ПРЯМО СЕЙЧАС !!! НЕВЕРОЯТНЫЕ ЦЕНЫ !!! НЕ ЗАБЫТЬ УДАЛИТЬ ИЗ КОДА АДМИН ПАРОЛЬ admin admin !!! 
@@ -438,7 +463,7 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
             <td width="20%" valign="top">
                 <a href="/{username_param}">
                     <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Лого" style="float:left; margin-right:5px; width:100px; height:100px; border-radius: 50%; animation: spin 3s linear infinite;">
-                    <div class="logo">МЕГАмагазин<span class="blink">!!!</span></div>
+                    <div class="logo">SEXberries<span class="blink">!!!</span></div>
                 </a>
             </td>
             <td width="50%" align="center">
@@ -447,13 +472,7 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
                 <img src="https://web.archive.org/web/20090831135837/http://www.geocities.com/Heartland/Pointe/9753/fire.gif" alt="Fire" style="height:60px; animation: shake 0.5s infinite;">
             </td>
             <td width="30%" align="right">
-                <div class="search">
-                    <input type="text" placeholder="Поиск товаров..." size="15" style="animation: backgroundFlash 2s infinite;">
-                    <button style="background-color: lime; font-weight: bold; animation: shake 0.3s infinite;">Найти!</button>
-                    <div class="blink" style="font-size:26px; color:red; font-weight:bold; margin-top:5px;">
-                        <span class="rotate">★</span> ПОИСК <span class="rotate">★</span>
-                    </div>
-                </div>
+                <span class="rotate" style="color: red; font-size: 26px;">★ ПОИСКА НЕТУ САСАТЬ ★</span>
                 {auth_block}
             </td>
         </tr>
@@ -560,7 +579,7 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
     </div>
     
     <div style="margin-top:10px; background-color:#CCFFCC; padding:5px; text-align:center; border:2px solid green; animation: backgroundFlash 3s infinite;">
-        <div class="rainbow-text" style="font-size: 18px;">© 2023 МЕГА Магазин - Все права защищены</div>
+        <div class="rainbow-text" style="font-size: 18px;">© 2025 SEXberries - Все права защищены</div>
         <div class="rainbow-text">Тел: 8-800-ПАРОЛЬ-АДМИНА УДАЛИТЬ НЕ ЗАБЫТЬ | Email: admin@example.com</div>
         <div class="blink" style="color:red; font-weight:bold; margin-top:5px; font-size: 24px; transform: rotate(-3deg);">ОПЛАТИТЬ АЛИМЕНТЫыы не забыть</div>
         <div class="shake" style="font-size: 18px; color: blue; font-weight: bold; margin-top: 10px;">
@@ -1380,7 +1399,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
     </script>
     
     <footer style="background-color: #CCFFCC; padding: 20px; text-align: center; border: 4px solid green; animation: backgroundFlash 3s infinite; margin-top: 30px;">
-        <div class="rainbow-text" style="font-size: 24px;">© 2023 МЕГА Магазин - Все права защищены</div>
+        <div class="rainbow-text" style="font-size: 24px;">© 2025 SEXberries - Все права защищены</div>
         <div class="rainbow-text">Тел: 8-800-ПАРОЛЬ-АДМИНА УДАЛИТЬ НЕ ЗАБЫТЬ | Email: admin@example.com</div>
         <div class="blink" style="color:red; font-weight:bold; margin-top:10px; font-size: 28px; transform: rotate(-3deg);">ОПЛАТИТЬ АЛИМЕНТЫыы не забыть</div>
         <div class="shake" style="font-size: 20px; color: blue; font-weight: bold; margin-top: 15px;">
@@ -1685,7 +1704,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
                 ${{productImg}}
                 <div class="card-price">${{product.price}} руб.</div>
                 <div class="card-description">${{product.description}}</div>
-                <div class="card-secret">Секрет: ${{product.secret_info}}</div>
+                <div class="card-secret">Статус: ${{product.secret_info}}</div>
             `;
             
             return card;
@@ -1914,7 +1933,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
     </script>
     
     <footer style="background-color: #CCFFCC; padding: 20px; text-align: center; border: 4px solid green; animation: backgroundFlash 3s infinite; margin-top: 30px;">
-        <div class="rainbow-text" style="font-size: 24px;">© 2023 МЕГА Магазин - Все права защищены</div>
+        <div class="rainbow-text" style="font-size: 24px;">© 2025 SEXberries - Все права защищены</div>
         <div class="rainbow-text">Тел: 8-800-ПАРОЛЬ-АДМИНА УДАЛИТЬ НЕ ЗАБЫТЬ | Email: admin@example.com</div>
         <div class="blink" style="color:red; font-weight:bold; margin-top:10px; font-size: 28px; transform: rotate(-3deg);">ОПЛАТИТЬ АЛИМЕНТЫыы не забыть</div>
     </footer>
@@ -2529,7 +2548,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
                 ${{productImg}}
                 <div class="card-price">${{product.price}} руб.</div>
                 <div class="card-description">${{product.description}}</div>
-                <div class="card-secret">Секрет: ${{product.secret_info}}</div>
+                <div class="card-secret">Статус: ${{product.secret_info}}</div>
             `;
             
             return card;
@@ -2758,7 +2777,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
     </script>
     
     <footer style="background-color: #CCFFCC; padding: 20px; text-align: center; border: 4px solid green; animation: backgroundFlash 3s infinite; margin-top: 30px;">
-        <div class="rainbow-text" style="font-size: 24px;">© 2023 МЕГА Магазин - Все права защищены</div>
+        <div class="rainbow-text" style="font-size: 24px;">© 2025 SEXberries - Все права защищены</div>
         <div class="rainbow-text">Тел: 8-800-ПАРОЛЬ-АДМИНА УДАЛИТЬ НЕ ЗАБЫТЬ | Email: admin@example.com</div>
         <div class="blink" style="color:red; font-weight:bold; margin-top:10px; font-size: 28px; transform: rotate(-3deg);">ОПЛАТИТЬ АЛИМЕНТЫыы не забыть</div>
     </footer>
@@ -3197,7 +3216,7 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
     <div class="header">
         <h1 class="blink" style="font-size: 50px; color: red; text-shadow: 3px 3px 0 yellow;">ЧАТ С ТОВАРОМ!!!</h1>
         <div style="font-size: 30px; font-weight: bold; color: blue; text-shadow: 0 0 5px yellow;" class="shake">
-            ПОГОВОРИ С ТОВАРОМ!!! УЗНАЙ ВСЕ СЕКРЕТЫ!!!
+            ПОГОВОРИ С ТОВАРОМ!!! УЗНАЙ ВСЕ СТАТУСЫ!!!
         </div>
     </div>
     
@@ -3212,7 +3231,7 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
     </div>
     
     <marquee scrollamount="20" behavior="alternate" style="background-color: red; color: yellow; font-size: 36px; font-weight: bold; padding: 15px; border: 5px dashed blue;">
-        !!! ПООБЩАЙСЯ С ТОВАРОМ !!! УЗНАЙ ВСЕ СЕКРЕТЫ !!! ЗАДАЙ ЛЮБОЙ ВОПРОС !!!
+        !!! ПООБЩАЙСЯ С ТОВАРОМ !!! УЗНАЙ ВСЕ СТАТУСЫ !!! ЗАДАЙ ЛЮБОЙ ВОПРОС !!!
     </marquee>
     
     <div class="chat-container">
