@@ -3047,7 +3047,6 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
         }}
         
         // Воспроизводим музыку при загрузке страницы
-        window.addEventListener('load', playRandomMusic);
     </script>
 </head>
 <body>
