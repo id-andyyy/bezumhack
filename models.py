@@ -4,8 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-class User(Base):
-    __tablename__ = "users"
+class Megabait(Base):
+    __tablename__ = "megabait"
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
