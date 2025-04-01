@@ -2064,7 +2064,6 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
         username_param = f"?username={url_username}"
     
     products = db.query(models.User).filter(models.User.is_product != 0).all()
-    print(products)
     products_json = "["
     for i, product in enumerate(products):
         if i > 0:
@@ -2880,6 +2879,11 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
         models.User.id == product_id,
         models.User.is_product != 0
     ).first()
+
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
     
     if not product:
         raise HTTPException(status_code=404, detail="Товар не найден")
@@ -3198,12 +3202,12 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
     </div>
     
     <div class="nav">
-        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
-        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
+        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
+        <a href="/products{username_param}" class="rainbow-text">Товары</a> | 
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
-        <a href="/protected-page{{username_param}}" class="rainbow-text">Личный кабинет</a> | 
-        <a href="/tinder-swipe{{username_param}}" class="rainbow-text">Тиндер</a> |
+        <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> | 
+        <a href="/tinder-swipe{username_param}" class="rainbow-text">Тиндер</a> |
         <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
     
