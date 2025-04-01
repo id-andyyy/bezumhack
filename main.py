@@ -3273,6 +3273,7 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
                     const data = await response.json();
                     // Добавляем ответ в чат
                     addMessage('assistant', data.response);
+
                 }} else {{
                     console.error('Ошибка при отправке сообщения');
                     addMessage('assistant', 'Произошла ошибка при общении с товаром. Попробуйте еще раз!');
@@ -3287,6 +3288,16 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
         
         // Функция добавления сообщения в чат
         function addMessage(role, content) {{
+            if (role !== 'user') {{
+              // Создаем и воспроизводим речь
+              const speech = new SpeechSynthesisUtterance(content);
+              speech.lang = 'ru-RU';
+              speech.volume = 1;
+              speech.rate = 1;
+              speech.pitch = 1;
+              window.speechSynthesis.speak(speech);
+            }}
+            
             const chatMessages = document.getElementById('chat-messages');
             
             const messageDiv = document.createElement('div');
