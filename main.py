@@ -1052,7 +1052,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             <p style="font-family: 'Wingdings', cursive;">{product.description}</p>
             <p class="rainbow-text">ID продавца: {product.owner_id}</p>
             <input type="hidden" id="secret_{product.id}" value="{product.secret_info}">
-            <a href="/product/{product.id}{username_param}" class="buy-link"><button class="buy-button shake" style="transform: rotate({product.id * 2}deg);">КУПИТЬ СЕЙЧАС!!!</button></a>
+            <a href="/chat/{product.id}{username_param}" class="buy-link"><button class="buy-button shake" style="transform: rotate({product.id * 2}deg);">КУПИТЬ СЕЙЧАС!!!</button></a>
         </div>
         '''
     add_product_form = '''
@@ -1721,7 +1721,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
                     ${{productImg}}
                     <div>${{product.price}} руб.</div>
                     <div class="product-buttons">
-                        <a href="/product/${{product.id}}" class="product-button">Подробнее</a>
+                        <a href="/chat/${{product.id}}" class="product-button">Подробнее</a>
                         <a href="/chat/${{product.id}}" class="product-button chat-button">Чат</a>
                     </div>
                 `;
@@ -1742,7 +1742,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
                     <div>${{product.name}}</div>
                     ${{productImg}}
                     <div>${{product.price}} руб.</div>
-                    <a href="/product/${{product.id}}" class="product-button">Подробнее</a>
+                    <a href="/chat/${{product.id}}" class="product-button">Подробнее</a>
                 `;
                 dislikedList.appendChild(productElement);
             }});
@@ -2552,7 +2552,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
                     ${{productImg}}
                     <div>${{product.price}} руб.</div>
                     <div class="product-buttons">
-                        <a href="/product/${{product.id}}" class="product-button">Подробнее</a>
+                        <a href="/chat/${{product.id}}" class="product-button">Подробнее</a>
                         <a href="/chat/${{product.id}}" class="product-button chat-button">Чат</a>
                     </div>
                 `;
@@ -2573,7 +2573,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
                     <div>${{product.name}}</div>
                     ${{productImg}}
                     <div>${{product.price}} руб.</div>
-                    <a href="/product/${{product.id}}" class="product-button">Подробнее</a>
+                    <a href="/chat/${{product.id}}" class="product-button">Подробнее</a>
                 `;
                 dislikedList.appendChild(productElement);
             }});
