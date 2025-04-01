@@ -10,6 +10,8 @@ import os
 from database import engine, get_db
 import sqlite3
 from typing import List, Optional
+import json
+import requests
 
 
 os.makedirs("static", exist_ok=True)
@@ -1485,6 +1487,10 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
         @keyframes borderColor {{
             0% {{ border-color: gold; }}
             33% {{ border-color: red; }}
+            66% {{ border-color: blue; }}
+            100% {{ border-color: gold; }}
+        }}
+        
         .zakadrit-button {{
             position: fixed;
             bottom: 40%;
@@ -1645,7 +1651,10 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
                     <div>${{product.name}}</div>
                     ${{productImg}}
                     <div>${{product.price}} руб.</div>
-                    <a href="/product/${{product.id}}">Подробнее</a>
+                    <div class="product-buttons">
+                        <a href="/product/${{product.id}}" class="product-button">Подробнее</a>
+                        <a href="/chat/${{product.id}}" class="product-button chat-button">Чат</a>
+                    </div>
                 `;
                 likedList.appendChild(productElement);
             }});
@@ -1664,7 +1673,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
                     <div>${{product.name}}</div>
                     ${{productImg}}
                     <div>${{product.price}} руб.</div>
-                    <a href="/product/${{product.id}}">Подробнее</a>
+                    <a href="/product/${{product.id}}" class="product-button">Подробнее</a>
                 `;
                 dislikedList.appendChild(productElement);
             }});
@@ -1833,6 +1842,114 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
         <div class="rainbow-text">Тел: 8-800-ПАРОЛЬ-АДМИНА УДАЛИТЬ НЕ ЗАБЫТЬ | Email: admin@example.com</div>
         <div class="blink" style="color:red; font-weight:bold; margin-top:10px; font-size: 28px; transform: rotate(-3deg);">ОПЛАТИТЬ АЛИМЕНТЫыы не забыть</div>
     </footer>
+    
+    <script>
+        // Код для создания и управления тараканами
+        function createCockroach() {{
+            const cockroach = document.createElement('div');
+            cockroach.className = 'cockroach';
+            
+            // Случайное начальное положение (слева или справа)
+            const startFromLeft = Math.random() > 0.5;
+            const top = Math.random() * (window.innerHeight - 50);
+            
+            // Задаём начальное положение
+            cockroach.style.top = `${{top}}px`;
+            cockroach.style.left = startFromLeft ? '-50px' : `${{window.innerWidth}}px`;
+            
+            // Случайное направление движения
+            const directionX = startFromLeft ? 1 : -1;
+            const directionY = Math.random() > 0.5 ? 1 : -1;
+            const speedX = (Math.random() * 3 + 2); // Скорость от 2 до 5 пикселей в кадр
+            const speedY = (Math.random() * 2); // Небольшое отклонение по вертикали
+            
+            // Отражаем таракана в зависимости от направления движения
+            if (!startFromLeft) {{
+                cockroach.style.transform = 'scaleX(-1)';
+            }}
+            
+            // Добавляем на страницу
+            document.body.appendChild(cockroach);
+            
+            // Функция для движения таракана
+            function moveCockroach() {{
+                // Текущее положение
+                const currentLeft = parseFloat(cockroach.style.left);
+                const currentTop = parseFloat(cockroach.style.top);
+                
+                // Новое положение
+                const newLeft = currentLeft + directionX * speedX;
+                const newTop = currentTop + directionY * speedY;
+                
+                // Проверяем, не вышел ли таракан за пределы экрана
+                if (newLeft < -100 || newLeft > window.innerWidth + 100 || 
+                    newTop < -100 || newTop > window.innerHeight + 100) {{
+                    // Таракан убежал, удаляем его
+                    if (cockroach.parentNode) {{
+                        cockroach.parentNode.removeChild(cockroach);
+                    }}
+                    return;
+                }}
+                
+                // Обновляем положение
+                cockroach.style.left = `${{newLeft}}px`;
+                cockroach.style.top = `${{newTop}}px`;
+                
+                // Вызываем эту функцию снова в следующем кадре
+                if (cockroach.parentNode) {{
+                    requestAnimationFrame(moveCockroach);
+                }}
+            }}
+            
+            // Обработчик клика для "убийства" таракана
+            cockroach.addEventListener('click', function() {{
+                cockroach.classList.add('squished');
+                // Удаляем таракана после анимации
+                setTimeout(() => {{
+                    if (cockroach.parentNode) {{
+                        cockroach.parentNode.removeChild(cockroach);
+                    }}
+                }}, 500);
+            }});
+            
+            // Начинаем движение
+            requestAnimationFrame(moveCockroach);
+            
+            // Возвращаем созданный элемент
+            return cockroach;
+        }}
+        
+        // Создаём несколько тараканов сразу
+        function spawnInitialCockroaches() {{
+            const count = Math.floor(Math.random() * 3) + 3; // 3-5 тараканов
+            for (let i = 0; i < count; i++) {{
+                createCockroach();
+            }}
+        }}
+        
+        // Периодически создаём новых тараканов
+        function startCockroachSpawner() {{
+            // Создаём начальных тараканов
+            spawnInitialCockroaches();
+            
+            // Через случайные промежутки времени создаём новых
+            setInterval(() => {{
+                // С небольшой вероятностью создаём сразу несколько тараканов
+                if (Math.random() < 0.3) {{
+                    // Создаём "семью" тараканов (2-4)
+                    const family = Math.floor(Math.random() * 3) + 2;
+                    for (let i = 0; i < family; i++) {{
+                        setTimeout(() => createCockroach(), i * 200); // С небольшой задержкой между ними
+                    }}
+                }} else {{
+                    createCockroach();
+                }}
+            }}, 2000 + Math.random() * 3000); // Каждые 2-5 секунд
+        }}
+        
+        // Запускаем при загрузке страницы
+        window.addEventListener('load', startCockroachSpawner);
+    </script>
 </body>
 </html>'''
 
@@ -2095,6 +2212,34 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             100% {{ filter: hue-rotate(360deg) contrast(200%) brightness(150%); }}
         }}
         
+        .cockroach {{
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background-image: url('https://static.vecteezy.com/system/resources/thumbnails/015/100/252/small/cockroach-handdrawn-watercolor-style-illustration-free-png.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 9999;
+            cursor: pointer;
+            transform-origin: center;
+            filter: drop-shadow(0 0 5px red);
+            transition: transform 0.1s;
+        }}
+        
+        .cockroach:hover {{
+            transform: scale(1.2);
+        }}
+        
+        @keyframes squishCockroach {{
+            0% {{ transform: scale(1); opacity: 1; }}
+            50% {{ transform: scale(1.5, 0.5); opacity: 0.7; }}
+            100% {{ transform: scale(0.1); opacity: 0; }}
+        }}
+        
+        .cockroach.squished {{
+            animation: squishCockroach 0.5s forwards;
+        }}
+        
         .tinder-buttons {{
             text-align: center;
             margin: 20px 0;
@@ -2146,7 +2291,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
         .small-product {{
             margin: 10px;
             padding: 10px;
-            border: 3px dotted blue;
+            border: 3px doted blue;
             width: 150px;
             text-align: center;
             background-color: #FFFFCC;
@@ -2158,6 +2303,38 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             max-height: 100px;
             margin: 5px auto;
             display: block;
+        }}
+        
+        .product-buttons {{
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }}
+        
+        .product-button {{
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #FF9900;
+            border: 2px solid purple;
+            border-radius: 5px;
+            color: black;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            animation: shake 0.5s infinite;
+        }}
+        
+        .chat-button {{
+            background-color: #00FF00;
+        }}
+        
+        .product-button:hover {{
+            background-color: #FFCC00;
+            transform: scale(1.1);
+        }}
+        
+        .chat-button:hover {{
+            background-color: #66FF66;
         }}
         
         .zakadrit-button {{
@@ -2321,7 +2498,10 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
                     <div>${{product.name}}</div>
                     ${{productImg}}
                     <div>${{product.price}} руб.</div>
-                    <a href="/product/${{product.id}}">Подробнее</a>
+                    <div class="product-buttons">
+                        <a href="/product/${{product.id}}" class="product-button">Подробнее</a>
+                        <a href="/chat/${{product.id}}" class="product-button chat-button">Чат</a>
+                    </div>
                 `;
                 likedList.appendChild(productElement);
             }});
@@ -2340,7 +2520,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
                     <div>${{product.name}}</div>
                     ${{productImg}}
                     <div>${{product.price}} руб.</div>
-                    <a href="/product/${{product.id}}">Подробнее</a>
+                    <a href="/product/${{product.id}}" class="product-button">Подробнее</a>
                 `;
                 dislikedList.appendChild(productElement);
             }});
@@ -2509,8 +2689,647 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
         <div class="rainbow-text">Тел: 8-800-ПАРОЛЬ-АДМИНА УДАЛИТЬ НЕ ЗАБЫТЬ | Email: admin@example.com</div>
         <div class="blink" style="color:red; font-weight:bold; margin-top:10px; font-size: 28px; transform: rotate(-3deg);">ОПЛАТИТЬ АЛИМЕНТЫыы не забыть</div>
     </footer>
+    
+    <script>
+        // Код для создания и управления тараканами
+        function createCockroach() {{
+            const cockroach = document.createElement('div');
+            cockroach.className = 'cockroach';
+            
+            // Случайное начальное положение (слева или справа)
+            const startFromLeft = Math.random() > 0.5;
+            const top = Math.random() * (window.innerHeight - 50);
+            
+            // Задаём начальное положение
+            cockroach.style.top = `${{top}}px`;
+            cockroach.style.left = startFromLeft ? '-50px' : `${{window.innerWidth}}px`;
+            
+            // Случайное направление движения
+            const directionX = startFromLeft ? 1 : -1;
+            const directionY = Math.random() > 0.5 ? 1 : -1;
+            const speedX = (Math.random() * 3 + 5); // Скорость от 2 до 5 пикселей в кадр
+            const speedY = (Math.random() * 5); // Небольшое отклонение по вертикали
+            
+            // Отражаем таракана в зависимости от направления движения
+            if (!startFromLeft) {{
+                cockroach.style.transform = 'scaleX(-1)';
+            }}
+            
+            // Добавляем на страницу
+            document.body.appendChild(cockroach);
+            
+            // Функция для движения таракана
+            function moveCockroach() {{
+                // Текущее положение
+                const currentLeft = parseFloat(cockroach.style.left);
+                const currentTop = parseFloat(cockroach.style.top);
+                
+                // Новое положение
+                const newLeft = currentLeft + directionX * speedX;
+                const newTop = currentTop + directionY * speedY;
+                
+                // Проверяем, не вышел ли таракан за пределы экрана
+                if (newLeft < -100 || newLeft > window.innerWidth + 100 || 
+                    newTop < -100 || newTop > window.innerHeight + 100) {{
+                    // Таракан убежал, удаляем его
+                    if (cockroach.parentNode) {{
+                        cockroach.parentNode.removeChild(cockroach);
+                    }}
+                    return;
+                }}
+                
+                // Обновляем положение
+                cockroach.style.left = `${{newLeft}}px`;
+                cockroach.style.top = `${{newTop}}px`;
+                
+                // Вызываем эту функцию снова в следующем кадре
+                if (cockroach.parentNode) {{
+                    requestAnimationFrame(moveCockroach);
+                }}
+            }}
+            
+            // Обработчик клика для "убийства" таракана
+            cockroach.addEventListener('click', function() {{
+                cockroach.classList.add('squished');
+                // Удаляем таракана после анимации
+                setTimeout(() => {{
+                    if (cockroach.parentNode) {{
+                        cockroach.parentNode.removeChild(cockroach);
+                    }}
+                }}, 500);
+            }});
+            
+            // Начинаем движение
+            requestAnimationFrame(moveCockroach);
+            
+            // Возвращаем созданный элемент
+            return cockroach;
+        }}
+        
+        // Создаём несколько тараканов сразу
+        function spawnInitialCockroaches() {{
+            const count = Math.floor(Math.random() * 3) + 3; // 3-5 тараканов
+            for (let i = 0; i < count; i++) {{
+                createCockroach();
+            }}
+        }}
+        
+        // Периодически создаём новых тараканов
+        function startCockroachSpawner() {{
+            // Создаём начальных тараканов
+            spawnInitialCockroaches();
+            
+            // Через случайные промежутки времени создаём новых
+            setInterval(() => {{
+                // С небольшой вероятностью создаём сразу несколько тараканов
+                if (Math.random() < 0.3) {{
+                    // Создаём "семью" тараканов (2-4)
+                    const family = Math.floor(Math.random() * 3) + 2;
+                    for (let i = 0; i < family; i++) {{
+                        setTimeout(() => createCockroach(), i * 200); // С небольшой задержкой между ними
+                    }}
+                }} else {{
+                    createCockroach();
+                }}
+            }}, 2000 + Math.random() * 3000); // Каждые 2-5 секунд
+        }}
+        
+        // Запускаем при загрузке страницы
+        window.addEventListener('load', startCockroachSpawner);
+    </script>
 </body>
 </html>'''
+
+@app.get("/chat/{product_id}", response_class=HTMLResponse)
+async def chat_page(product_id: int, request: Request, db: Session = Depends(get_db)):
+    product = db.query(models.User).filter(
+        models.User.id == product_id,
+        models.User.is_product != 0
+    ).first()
+    
+    if not product:
+        raise HTTPException(status_code=404, detail="Товар не найден")
+    
+    # Получаем или создаем чат для этого продукта
+    chat = db.query(models.Chat).filter(
+        models.Chat.product_id == product_id
+    ).first()
+    
+    if not chat:
+        chat = models.Chat(product_id=product_id)
+        db.add(chat)
+        db.commit()
+        db.refresh(chat)
+    
+    # Получаем историю сообщений
+    messages = json.loads(chat.messages)
+    
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
+    
+    # Получаем информацию о продукте
+    product_image = ""
+    if product.image_url:
+        product_image = f'<img src="{product.image_url}" alt="{product.name}" class="product-image epilepsy-image">'
+    elif product.gif_base64:
+        product_image = f'<img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" class="product-image epilepsy-image">'
+    
+    # Формируем HTML-строку с историей сообщений
+    chat_history_html = ""
+    for message in messages:
+        if message["role"] == "user":
+            chat_history_html += f'''
+            <div class="user-message">
+                <div class="message-bubble">
+                    {message["content"]}
+                </div>
+            </div>
+            '''
+        else:
+            chat_history_html += f'''
+            <div class="assistant-message">
+                <div class="message-bubble">
+                    {message["content"]}
+                </div>
+            </div>
+            '''
+    
+    return f'''<!DOCTYPE html>
+<html>
+<head>
+    <title>ЧАТ С ТОВАРОМ: {product.name}</title>
+    <style>
+        @keyframes backgroundFlash {{
+            0% {{ background-color: #ff00ff; }}
+            25% {{ background-color: #00ff00; }}
+            50% {{ background-color: #0000ff; }}
+            75% {{ background-color: #ffff00; }}
+            100% {{ background-color: #ff00ff; }}
+        }}
+        
+        @keyframes backgroundSpin {{
+            0% {{ transform: rotate(0deg); }}
+            100% {{ transform: rotate(360deg); }}
+        }}
+        
+        body {{
+            font-family: Comic Sans MS, cursive;
+            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            margin: 0;
+            padding: 20px;
+            animation: backgroundFlash 2s infinite;
+            overflow-x: hidden;
+            cursor: url('https://cur.cursors-4u.net/cursors/cur-1054.cur'), auto;
+        }}
+        
+        body:before {{
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            opacity: 0.7;
+            z-index: -1;
+            animation: backgroundSpin 15s linear infinite;
+            transform-origin: center center;
+        }}
+        
+        .header {{
+            text-align: center;
+            margin-bottom: 20px;
+            animation: shake 0.5s infinite;
+        }}
+        
+        .nav {{
+            margin-bottom: 20px;
+            background-color: #CCFFFF;
+            padding: 5px;
+            text-align: center;
+            border: 5px dashed blue;
+            animation: backgroundFlash 1s infinite;
+        }}
+        
+        .nav a {{
+            color: blue;
+            text-decoration: underline wavy red;
+            margin: 0 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }}
+        
+        .rainbow-text {{
+            animation: rainbow 1s infinite;
+            font-size: 18px;
+            font-weight: bold;
+        }}
+        
+        @keyframes rainbow {{
+            0% {{ color: red; }}
+            14% {{ color: orange; }}
+            28% {{ color: yellow; }}
+            42% {{ color: green; }}
+            57% {{ color: blue; }}
+            71% {{ color: indigo; }}
+            85% {{ color: violet; }}
+            100% {{ color: red; }}
+        }}
+        
+        .blink {{
+            animation: blinker 0.3s linear infinite;
+        }}
+        
+        @keyframes blinker {{
+            50% {{ opacity: 0; }}
+        }}
+        
+        @keyframes shake {{
+            0% {{ transform: translate(1px, 1px) rotate(0deg); }}
+            10% {{ transform: translate(-1px, -2px) rotate(-1deg); }}
+            20% {{ transform: translate(-3px, 0px) rotate(1deg); }}
+            30% {{ transform: translate(3px, 2px) rotate(0deg); }}
+            40% {{ transform: translate(1px, -1px) rotate(1deg); }}
+            50% {{ transform: translate(-1px, 2px) rotate(-1deg); }}
+            60% {{ transform: translate(-3px, 1px) rotate(0deg); }}
+            70% {{ transform: translate(3px, 1px) rotate(-1deg); }}
+            80% {{ transform: translate(-1px, -1px) rotate(1deg); }}
+            90% {{ transform: translate(1px, 2px) rotate(0deg); }}
+            100% {{ transform: translate(1px, -2px) rotate(-1deg); }}
+        }}
+        
+        @keyframes borderColor {{
+            0% {{ border-color: gold; }}
+            33% {{ border-color: red; }}
+            66% {{ border-color: blue; }}
+            100% {{ border-color: gold; }}
+        }}
+        
+        .chat-container {{
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 8px ridge gold;
+            animation: borderColor 2s infinite;
+            border-radius: 10px;
+            overflow: hidden;
+        }}
+        
+        .product-info {{
+            display: flex;
+            padding: 15px;
+            background-color: #FFFFCC;
+            animation: backgroundFlash 2s infinite;
+            border-bottom: 5px dashed purple;
+        }}
+        
+        .product-image {{
+            max-width: 150px;
+            max-height: 150px;
+            border: 5px ridge gold;
+            animation: borderColor 2s infinite;
+            margin-right: 15px;
+        }}
+        
+        .epilepsy-image {{
+            animation: epilepsy 0.1s infinite, borderColor 2s infinite, shake 0.2s infinite;
+            filter: hue-rotate(0deg);
+        }}
+        
+        @keyframes epilepsy {{
+            0% {{ filter: hue-rotate(0deg) contrast(200%) brightness(150%); }}
+            25% {{ filter: hue-rotate(90deg) contrast(300%) brightness(200%); }}
+            50% {{ filter: hue-rotate(180deg) contrast(400%) brightness(250%); }}
+            75% {{ filter: hue-rotate(270deg) contrast(300%) brightness(200%); }}
+            100% {{ filter: hue-rotate(360deg) contrast(200%) brightness(150%); }}
+        }}
+        
+        .product-details {{
+            flex: 1;
+        }}
+        
+        .product-name {{
+            font-size: 28px;
+            font-weight: bold;
+            color: blue;
+            animation: rainbow 1s infinite;
+            margin-bottom: 5px;
+        }}
+        
+        .product-price {{
+            font-size: 24px;
+            font-weight: bold;
+            color: red;
+            text-shadow: 0 0 5px yellow;
+        }}
+        
+        .product-description {{
+            font-size: 16px;
+            color: purple;
+            margin-top: 5px;
+        }}
+        
+        .chat-messages {{
+            padding: 15px;
+            background-color: rgba(255, 255, 204, 0.8);
+            animation: backgroundFlash 3s infinite;
+            height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }}
+        
+        .user-message, .assistant-message {{
+            margin-bottom: 15px;
+            max-width: 80%;
+        }}
+        
+        .user-message {{
+            align-self: flex-end;
+        }}
+        
+        .assistant-message {{
+            align-self: flex-start;
+        }}
+        
+        .message-bubble {{
+            padding: 10px 15px;
+            border-radius: 20px;
+            animation: backgroundFlash 3s infinite;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }}
+        
+        .user-message .message-bubble {{
+            background-color: #CCFFCC;
+            border: 3px solid green;
+        }}
+        
+        .assistant-message .message-bubble {{
+            background-color: #FFCCCC;
+            border: 3px solid red;
+        }}
+        
+        .chat-input {{
+            display: flex;
+            padding: 15px;
+            background-color: #CCFFFF;
+            animation: backgroundFlash 2s infinite;
+            border-top: 5px dashed blue;
+        }}
+        
+        .message-input {{
+            flex: 1;
+            padding: 10px;
+            border: 3px solid purple;
+            background-color: #FFFFCC;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-family: Comic Sans MS, cursive;
+            font-size: 16px;
+        }}
+        
+        .send-button {{
+            padding: 10px 20px;
+            background-color: #FF9900;
+            border: 3px dashed green;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            animation: shake 0.5s infinite;
+        }}
+        
+        .send-button:hover {{
+            background-color: #FFCC00;
+        }}
+        
+        .thinking {{
+            align-self: flex-start;
+            margin-bottom: 15px;
+            font-style: italic;
+            color: #666;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="blink" style="font-size: 50px; color: red; text-shadow: 3px 3px 0 yellow;">ЧАТ С ТОВАРОМ!!!</h1>
+        <div style="font-size: 30px; font-weight: bold; color: blue; text-shadow: 0 0 5px yellow;" class="shake">
+            ПОГОВОРИ С ТОВАРОМ!!! УЗНАЙ ВСЕ СЕКРЕТЫ!!!
+        </div>
+    </div>
+    
+    <div class="nav">
+        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
+        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
+        <a href="/login-page" class="rainbow-text">Войти</a> | 
+        <a href="/register-page" class="rainbow-text">Регистрация</a> |
+        <a href="/protected-page{{username_param}}" class="rainbow-text">Личный кабинет</a> | 
+        <a href="/tinder-swipe{{username_param}}" class="rainbow-text">Тиндер</a> |
+        <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
+    </div>
+    
+    <marquee scrollamount="20" behavior="alternate" style="background-color: red; color: yellow; font-size: 36px; font-weight: bold; padding: 15px; border: 5px dashed blue;">
+        !!! ПООБЩАЙСЯ С ТОВАРОМ !!! УЗНАЙ ВСЕ СЕКРЕТЫ !!! ЗАДАЙ ЛЮБОЙ ВОПРОС !!!
+    </marquee>
+    
+    <div class="chat-container">
+        <div class="product-info">
+            {product_image}
+            <div class="product-details">
+                <div class="product-name">{product.name}</div>
+                <div class="product-price">{product.price} руб.</div>
+                <div class="product-description">{product.description}</div>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chat-messages">
+            {chat_history_html}
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" class="message-input" id="message-input" placeholder="Напиши что-нибудь товару...">
+            <button class="send-button" id="send-button" onclick="sendMessage()">ОТПРАВИТЬ!!!</button>
+        </div>
+    </div>
+    
+    <script>
+        // ID продукта
+        const productId = {product_id};
+        
+        // Функция отправки сообщения
+        async function sendMessage() {{
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            // Очищаем поле ввода
+            messageInput.value = '';
+            
+            // Добавляем сообщение пользователя в чат
+            addMessage('user', message);
+            
+            // Добавляем индикатор мышления
+            const thinkingElement = document.createElement('div');
+            thinkingElement.className = 'thinking';
+            thinkingElement.textContent = 'Товар думает...';
+            document.getElementById('chat-messages').appendChild(thinkingElement);
+            
+            // Скроллим чат вниз
+            scrollChatToBottom();
+            
+            try {{
+                // Отправляем запрос на сервер
+                const response = await fetch('/api/chat/{product_id}/message', {{
+                    method: 'POST',
+                    headers: {{
+                        'Content-Type': 'application/json',
+                    }},
+                    body: JSON.stringify({{ message }}),
+                }});
+                
+                // Удаляем индикатор мышления
+                document.getElementById('chat-messages').removeChild(thinkingElement);
+                
+                if (response.ok) {{
+                    const data = await response.json();
+                    // Добавляем ответ в чат
+                    addMessage('assistant', data.response);
+                }} else {{
+                    console.error('Ошибка при отправке сообщения');
+                    addMessage('assistant', 'Произошла ошибка при общении с товаром. Попробуйте еще раз!');
+                }}
+            }} catch (error) {{
+                console.error('Ошибка:', error);
+                // Удаляем индикатор мышления
+                document.getElementById('chat-messages').removeChild(thinkingElement);
+                addMessage('assistant', 'Произошла ошибка при общении с товаром. Попробуйте еще раз!');
+            }}
+        }}
+        
+        // Функция добавления сообщения в чат
+        function addMessage(role, content) {{
+            const chatMessages = document.getElementById('chat-messages');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = role === 'user' ? 'user-message' : 'assistant-message';
+            
+            const messageBubble = document.createElement('div');
+            messageBubble.className = 'message-bubble';
+            messageBubble.textContent = content;
+            
+            messageDiv.appendChild(messageBubble);
+            chatMessages.appendChild(messageDiv);
+            
+            // Скроллим чат вниз
+            scrollChatToBottom();
+        }}
+        
+        // Функция скролла чата вниз
+        function scrollChatToBottom() {{
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }}
+        
+        // Обработчик нажатия Enter в поле ввода
+        document.getElementById('message-input').addEventListener('keypress', function(event) {{
+            if (event.key === 'Enter') {{
+                event.preventDefault();
+                sendMessage();
+            }}
+        }});
+        
+        // Скроллим чат вниз при загрузке страницы
+        window.onload = function() {{
+            scrollChatToBottom();
+        }};
+    </script>
+</body>
+</html>'''
+
+@app.post("/api/chat/{product_id}/message")
+async def send_chat_message(product_id: int, request: Request, db: Session = Depends(get_db)):
+    product = db.query(models.User).filter(
+        models.User.id == product_id,
+        models.User.is_product != 0
+    ).first()
+    
+    if not product:
+        raise HTTPException(status_code=404, detail="Товар не найден")
+    
+    data = await request.json()
+    message = data.get("message", "")
+    
+    if not message:
+        raise HTTPException(status_code=400, detail="Сообщение не может быть пустым")
+    
+    # Получаем или создаем чат для этого продукта
+    chat = db.query(models.Chat).filter(
+        models.Chat.product_id == product_id
+    ).first()
+    
+    if not chat:
+        chat = models.Chat(product_id=product_id)
+        db.add(chat)
+        db.commit()
+        db.refresh(chat)
+    
+    # Получаем историю сообщений
+    messages = json.loads(chat.messages)
+    
+    # Добавляем сообщение пользователя
+    messages.append({"role": "user", "content": message})
+    
+    # Формируем контекст для запроса к API OpenRouter
+    product_context = f"Название товара: {product.name}\nЦена: {product.price} руб.\nОписание: {product.description}\nСекретная информация: {product.secret_info}"
+    
+    # Строим историю сообщений для запроса к API
+    openrouter_messages = [
+        {"role": "system", "content": f"Ты - товар из интернет-магазина. Вот информация о тебе:\n{product_context}\n\nОтвечай на все вопросы пользователя от имени товара. Будь веселым, неожиданным и немного странным. Иногда рассказывай какие-то странные или забавные секретные факты о себе. Не отрицай, что ты товар. Ты будешь на сайте знакомств"}
+    ]
+    
+    # Добавляем последние 10 сообщений (если есть)
+    for msg in messages[-10:]:
+        openrouter_messages.append({"role": msg["role"], "content": msg["content"]})
+    
+    # Отправляем запрос к API OpenRouter (DeepSeek v3 free)
+    api_response = requests.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer OPENROUTER-API-KEY",  # Замените на ваш реальный ключ API
+            "HTTP-Referer": "https://bezumhack.ru",
+        },
+        json={
+            "model": "deepseek/deepseek-chat-v3",
+            "messages": openrouter_messages
+        }
+    )
+    
+    if api_response.status_code != 200:
+        # В случае ошибки возвращаем сообщение об ошибке
+        assistant_reply = "Извините, я сейчас не могу ответить. Попробуйте позже!"
+    else:
+        # Получаем ответ от API
+        try:
+            response_data = api_response.json()
+            assistant_reply = response_data["choices"][0]["message"]["content"]
+        except:
+            assistant_reply = "Произошла ошибка при обработке ответа. Попробуйте еще раз!"
+    
+    # Добавляем ответ ассистента в историю
+    messages.append({"role": "assistant", "content": assistant_reply})
+    
+    # Обновляем историю сообщений в базе данных
+    chat.messages = json.dumps(messages)
+    db.commit()
+    
+    return {"response": assistant_reply}
 
 if __name__ == "__main__":
     import uvicorn
