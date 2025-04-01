@@ -923,6 +923,11 @@ async def logout():
 
 @app.get("/products", response_class=HTMLResponse)
 async def list_products(request: Request, db: Session = Depends(get_db)):
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
+        
     products = db.query(models.User).filter(models.User.is_product != 0).all()
     products_html = ""
     for product in products:
@@ -931,7 +936,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             product_image = f'<img src="{product.image_url}" alt="{product.name}" class="product-image epilepsy-image" style="transform: rotate({product.id * 3}deg);">'
         elif product.gif_base64:
             product_image = f'<img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" class="product-image epilepsy-image" style="transform: rotate({-product.id * 5}deg);">'
-            
+        
         products_html += f'''
         <div class="product" style="transform: rotate({(product.id % 3) - 1}deg);">
             <h2 class="blink" style="color: #{hash(product.name) % 0xFFFFFF:06x};">{product.name}</h2>
@@ -989,10 +994,6 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
         <button type="button" onclick="executeQuery()" class="rainbow-button shake">Найти через JavaScript</button>
     </form>
     '''
-    url_username = request.query_params.get('username')
-    username_param = ""
-    if url_username:
-        username_param = f"?username={url_username}"
     
     return f'''<!DOCTYPE html>
 <html>
