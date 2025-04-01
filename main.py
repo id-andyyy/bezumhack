@@ -169,27 +169,14 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
         
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://kartinki-life.ru/articles/2021/03/11/poshlye-pozdravleniya-s-dnem-rozhdeniya-gif-4.gif');
             margin: 0;
             padding: 5px;
-            cursor: url('https://cur.cursors-4u.net/cursors/cur-1054.cur'), auto;
+            cursor: url('https://kartinki-life.ru/articles/2021/03/11/poshlye-pozdravleniya-s-dnem-rozhdeniya-gif-4.gif'), auto;
             animation: backgroundFlash 2s infinite;
             overflow-x: hidden;
         }}
-        
-        body:before {{
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
-            opacity: 0.7;
-            z-index: -1;
-            animation: backgroundSpin 20s linear infinite;
-            transform-origin: center center;
-        }}
+    
         
         table {{
             width: 100%;
@@ -509,7 +496,7 @@ async def register_page(request: Request):
     <style>
         body {
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
+            background-image: url('https://kartinki-life.ru/articles/2022/11/18/s-dnem-rozhdeniya-otkrytki-prikolnye-mercaushhie-38.gif');
             margin: 0;
             padding: 20px;
             text-align: center;
@@ -604,7 +591,7 @@ async def login_page(request: Request, error: str = None):
     <style>
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
             padding: 20px;
             text-align: center;
@@ -759,7 +746,7 @@ async def protected_page(request: Request):
     <style>
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
             padding: 20px;
         }}
@@ -1027,12 +1014,12 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
         
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
             padding: 20px;
             animation: backgroundFlash 2s infinite;
             overflow-x: hidden;
-            cursor: url('https://cur.cursors-4u.net/cursors/cur-1054.cur'), auto;
+            cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
         
         body:before {{
@@ -1042,7 +1029,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             opacity: 0.7;
             z-index: -1;
             animation: backgroundSpin 15s linear infinite;
@@ -1405,12 +1392,12 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
         
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
             padding: 20px;
             animation: backgroundFlash 2s infinite;
             overflow-x: hidden;
-            cursor: url('https://cur.cursors-4u.net/cursors/cur-1054.cur'), auto;
+            cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
         
         body:before {{
@@ -1420,7 +1407,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             opacity: 0.7;
             z-index: -1;
             animation: backgroundSpin 15s linear infinite;
@@ -2023,12 +2010,12 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
         
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
             padding: 20px;
             animation: backgroundFlash 2s infinite;
             overflow-x: hidden;
-            cursor: url('https://cur.cursors-4u.net/cursors/cur-1054.cur'), auto;
+            cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
         
         body:before {{
@@ -2038,7 +2025,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             opacity: 0.7;
             z-index: -1;
             animation: backgroundSpin 15s linear infinite;
@@ -2216,7 +2203,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             position: absolute;
             width: 200px;
             height: 200px;
-            background-image: url('https://static.vecteezy.com/system/resources/thumbnails/015/100/252/small/cockroach-handdrawn-watercolor-style-illustration-free-png.png');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             background-size: contain;
             background-repeat: no-repeat;
             z-index: 9999;
@@ -2876,12 +2863,12 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
         
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
             padding: 20px;
             animation: backgroundFlash 2s infinite;
             overflow-x: hidden;
-            cursor: url('https://cur.cursors-4u.net/cursors/cur-1054.cur'), auto;
+            cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
         
         body:before {{
@@ -2891,7 +2878,7 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             opacity: 0.7;
             z-index: -1;
             animation: backgroundSpin 15s linear infinite;
