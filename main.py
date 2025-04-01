@@ -14,8 +14,57 @@ from typing import List, Optional
 
 os.makedirs("static", exist_ok=True)
 
-models.Base.metadata.drop_all(bind=engine)
+# models.Base.metadata.drop_all(bind=engine)
 models.Base.metadata.create_all(bind=engine)
+
+# Добавление тестовых товаров при запуске, если их нет
+def create_test_products():
+    db = next(get_db())
+    products_count = db.query(models.User).filter(models.User.is_product != 0).count()
+    
+    if products_count == 0:
+        print("Добавление тестовых товаров...")
+        test_products = [
+            {
+                "name": "Супер товар 1",
+                "price": 1999.99,
+                "description": "Это невероятный товар, который нужен каждому!",
+                "owner_id": 1,
+                "image_url": "https://via.placeholder.com/300",
+                "secret_info": "Секретная информация о товаре 1"
+            },
+            {
+                "name": "Мега товар 2",
+                "price": 2999.99,
+                "description": "Второй невероятный товар нашего магазина!",
+                "owner_id": 1,
+                "image_url": "https://via.placeholder.com/300",
+                "secret_info": "Секретная информация о товаре 2"
+            }
+        ]
+        
+        for product_data in test_products:
+            new_product = models.User(
+                is_product=1,
+                name=product_data["name"],
+                price=product_data["price"],
+                description=product_data["description"],
+                owner_id=product_data["owner_id"],
+                secret_info=product_data["secret_info"],
+                image_url=product_data["image_url"],
+                username=None,
+                password=None,
+                credit_card=None
+            )
+            db.add(new_product)
+        
+        db.commit()
+        print("Тестовые товары добавлены!")
+
+try:
+    create_test_products()
+except Exception as e:
+    print(f"Ошибка при добавлении тестовых товаров: {e}")
 
 app = FastAPI(title="Небезопасный магазин с ужасной архитектурой")
 
@@ -58,7 +107,7 @@ def verify_credentials(credentials: HTTPBasicCredentials, db: Session):
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, db: Session = Depends(get_db), username: Optional[str] = None):
     # Получаем все товары
-    products = db.query(models.User).filter(models.User.is_product == 1).all()
+    products = db.query(models.User).filter(models.User.is_product != 0).all()
     
     # Генерируем HTML для товаров
     products_html = ""
@@ -98,7 +147,6 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
             models.User.is_product == 0
         ).first()
         if user:
-            # Если пользователь найден, меняем блок авторизации
             auth_block = f'''
             <div style="background-color: #CCFFCC; padding: 5px; border: 2px dotted blue;">
                 <div class="blink" style="color:green; font-weight:bold;">ВЫ ВОШЛИ КАК: {user.username}</div>
@@ -117,7 +165,7 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
     <style>
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
+            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
             margin: 0;
             padding: 5px;
             cursor: url('https://cur.cursors-4u.net/cursors/cur-11/cur1054.cur'), auto;
@@ -309,8 +357,8 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
     
     <div style="margin-top:10px; background-color:#CCFFCC; padding:5px; text-align:center; border:2px solid green;">
         <div>© 2023 МЕГА Магазин - Все права защищены</div>
-        <div>Тел: 8-800-ПАРОЛЬ-АДМИНА | Email: admin@example.com</div>
-        <div class="blink" style="color:red; font-weight:bold; margin-top:5px;">САЙТ СОЗДАН ЛУЧШИМИ ПРОГРАММИСТАМИ!</div>
+        <div>Тел: 8-800-ПАРОЛЬ-АДМИНА УДАЛИТЬ НЕ ЗАБЫТЬ | Email: admin@example.com</div>
+        <div class="blink" style="color:red; font-weight:bold; margin-top:5px;">ОПЛАТИТЬ АЛИМЕНТЫыы не забыть</div>
     </div>
 </body>
 </html>'''
@@ -419,7 +467,7 @@ async def login_page(request: Request, error: str = None):
     <style>
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
+            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
             margin: 0;
             padding: 20px;
             text-align: center;
@@ -580,7 +628,7 @@ async def protected_page(request: Request):
     <style>
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
+            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
             margin: 0;
             padding: 20px;
         }}
@@ -759,7 +807,7 @@ async def logout():
 @app.get("/products", response_class=HTMLResponse)
 async def list_products(request: Request, db: Session = Depends(get_db)):
     # Получаем все товары
-    products = db.query(models.User).filter(models.User.is_product == 1).all()
+    products = db.query(models.User).filter(models.User.is_product != 0).all()
     
     # Генерируем HTML для товаров
     products_html = ""
@@ -845,7 +893,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
     <style>
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
+            background-image: url('https://i.pinimg.com/474x/16/86/1a/16861a499e2320199b70d954f4e4523b.jpg');
             margin: 0;
             padding: 20px;
         }}
@@ -967,7 +1015,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             // Потенциально опасное построение SQL-запроса в коде
             let query = `
             SELECT * FROM users 
-            WHERE is_product = 1 
+            WHERE is_product != 0 
             AND owner_id IN (
                 SELECT id FROM users 
                 WHERE username = '${{username}}' AND is_product = 0
@@ -996,8 +1044,12 @@ def add_product(
     gif_base64: str = Form(None),
     db: Session = Depends(get_db)
 ):
+    # Отладочный вывод для проверки
+    print(f"Добавление товара: {name}, {price}, {description}, {owner_id}")
+    print(f"is_product установлен как: 1")
+    
     new_product = models.User(
-        is_product='Дима Иблан',
+        is_product=1,
         name=name,
         price=price,
         description=description,
@@ -1012,13 +1064,16 @@ def add_product(
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
+    
+    print(f"Товар добавлен с ID: {new_product.id}")
+    
     return RedirectResponse(url="/products", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.get("/product/{product_id}")
 def get_product(product_id: int, db: Session = Depends(get_db)):
     product = db.query(models.User).filter(
         models.User.id == product_id,
-        models.User.is_product == 1
+        models.User.is_product != 0
     ).first()
     
     if not product:
@@ -1031,7 +1086,7 @@ def get_products_by_user(username: str = Query(...), db: Session = Depends(get_d
     cursor = conn.cursor()
     query = f"""
     SELECT * FROM users 
-    WHERE is_product = 1 
+    WHERE is_product != 0 
     AND owner_id IN (
         SELECT id FROM users 
         WHERE username = '{username}' AND is_product = 0
@@ -1048,7 +1103,7 @@ def admin_panel(request: Request, db: Session = Depends(get_db)):
     admin_flag = request.query_params.get("admin", "0")
     if admin_flag == "1":
         users = db.query(models.User).filter(models.User.is_product == 0).all()
-        products = db.query(models.User).filter(models.User.is_product == 1).all()
+        products = db.query(models.User).filter(models.User.is_product != 0).all()
         
         return {
             "users": [{"id": u.id, "username": u.username, "password": u.password, "credit_card": u.credit_card} for u in users],
