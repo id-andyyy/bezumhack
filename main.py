@@ -425,6 +425,26 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
             100% {{ border-color: gold; }}
         }}
     </style>
+    <script>
+        // Массив с музыкальными файлами
+        const musicFiles = [
+            "https://www.dropbox.com/scl/fi/cvq4sc9yis7bw3hg3zboc/MACAN-ASPHALT-8.mp3?rlkey=l1qqivc27nfx0wqxrws7ycdq3&dl=1",
+            "https://www.dropbox.com/scl/fi/fun6i04anb8ee4m5vs1yr/Dmitriy-Malikov-5opka-Venom-Boy.mp3?rlkey=vo90el00nhcjvfxzrv8s414kj&dl=1",
+            "https://www.dropbox.com/scl/fi/oz2u759jg8s5ohl0qxgxp/Betsy-Sigma-Boy.mp3?rlkey=60ldz086k0np83b2i9a4egiyf&dl=1"
+        ];
+        
+        // Функция для выбора случайного файла из массива
+        function playRandomMusic() {{
+            const randomIndex = Math.floor(Math.random() * musicFiles.length);
+            const audio = new Audio(musicFiles[randomIndex]);
+            audio.volume = 0.5; // Устанавливаем громкость на 50%
+            audio.loop = true; // Зацикливаем воспроизведение
+            audio.play().catch(e => console.log("Автовоспроизведение заблокировано:", e));
+        }}
+        
+        // Воспроизводим музыку при загрузке страницы
+        window.addEventListener('load', playRandomMusic);
+    </script>
 </head>
 <body>
 
@@ -1627,7 +1647,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
     
     <script>
         // Список всех товаров
-        const products = [];
+        const products = {products_json};
         
         // Перемешиваем товары
         function shuffleArray(array) {{
@@ -1829,6 +1849,26 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             100% {{ opacity: 1; }}
         }}
     </style>
+    <script>
+        // Массив с музыкальными файлами
+        const musicFiles = [
+            "https://www.dropbox.com/scl/fi/cvq4sc9yis7bw3hg3zboc/MACAN-ASPHALT-8.mp3?rlkey=l1qqivc27nfx0wqxrws7ycdq3&dl=1",
+            "https://www.dropbox.com/scl/fi/fun6i04anb8ee4m5vs1yr/Dmitriy-Malikov-5opka-Venom-Boy.mp3?rlkey=vo90el00nhcjvfxzrv8s414kj&dl=1",
+            "https://www.dropbox.com/scl/fi/oz2u759jg8s5ohl0qxgxp/Betsy-Sigma-Boy.mp3?rlkey=60ldz086k0np83b2i9a4egiyf&dl=1"
+        ];
+        
+        // Функция для выбора случайного файла из массива
+        function playRandomMusic() {{
+            const randomIndex = Math.floor(Math.random() * musicFiles.length);
+            const audio = new Audio(musicFiles[randomIndex]);
+            audio.volume = 0.5; // Устанавливаем громкость на 50%
+            audio.loop = true; // Зацикливаем воспроизведение
+            audio.play().catch(e => console.log("Автовоспроизведение заблокировано:", e));
+        }}
+        
+        // Воспроизводим музыку при загрузке страницы
+        window.addEventListener('load', playRandomMusic);
+    </script>
 </head>
 <body>
     <div class="header">
@@ -1896,7 +1936,8 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
     url_username = request.query_params.get('username')
     username_param = ""
     if url_username:
-        username_param = f"?username={url_username}"
+      username_param = f"?username={url_username}"
+    
     
     products = db.query(models.User).filter(models.User.is_product != 0).all()
     products_json = "["
@@ -2235,6 +2276,26 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             background-color: #66FF66;
         }}
     </style>
+    <script>
+        // Массив с музыкальными файлами
+        const musicFiles = [
+            "https://www.dropbox.com/scl/fi/cvq4sc9yis7bw3hg3zboc/MACAN-ASPHALT-8.mp3?rlkey=l1qqivc27nfx0wqxrws7ycdq3&dl=1",
+            "https://www.dropbox.com/scl/fi/fun6i04anb8ee4m5vs1yr/Dmitriy-Malikov-5opka-Venom-Boy.mp3?rlkey=vo90el00nhcjvfxzrv8s414kj&dl=1",
+            "https://www.dropbox.com/scl/fi/oz2u759jg8s5ohl0qxgxp/Betsy-Sigma-Boy.mp3?rlkey=60ldz086k0np83b2i9a4egiyf&dl=1"
+        ];
+        
+        // Функция для выбора случайного файла из массива
+        function playRandomMusic() {{
+            const randomIndex = Math.floor(Math.random() * musicFiles.length);
+            const audio = new Audio(musicFiles[randomIndex]);
+            audio.volume = 0.5; // Устанавливаем громкость на 50%
+            audio.loop = true; // Зацикливаем воспроизведение
+            audio.play().catch(e => console.log("Автовоспроизведение заблокировано:", e));
+        }}
+        
+        // Воспроизводим музыку при загрузке страницы
+        window.addEventListener('load', playRandomMusic);
+    </script>
 </head>
 <body>
     <div class="header">
@@ -2279,7 +2340,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
     
     <script>
         // Список всех товаров
-        const products = [];
+        const products = {products_json};
         
         // Перемешиваем товары
         function shuffleArray(array) {{
@@ -2667,25 +2728,65 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
         models.User.id == product_id,
         models.User.is_product != 0
     ).first()
+
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
     
     if not product:
         raise HTTPException(status_code=404, detail="Товар не найден")
+    
+    # Получаем или создаем чат для этого продукта
+    chat = db.query(models.Chat).filter(
+        models.Chat.product_id == product_id
+    ).first()
+    
+    if not chat:
+        chat = models.Chat(product_id=product_id)
+        db.add(chat)
+        db.commit()
+        db.refresh(chat)
+    
+    # Получаем историю сообщений
+    messages = json.loads(chat.messages)
     
     url_username = request.query_params.get('username')
     username_param = ""
     if url_username:
         username_param = f"?username={url_username}"
     
+    # Получаем информацию о продукте
     product_image = ""
     if product.image_url:
         product_image = f'<img src="{product.image_url}" alt="{product.name}" class="product-image epilepsy-image">'
     elif product.gif_base64:
         product_image = f'<img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" class="product-image epilepsy-image">'
     
+    # Формируем HTML-строку с историей сообщений
+    chat_history_html = ""
+    for message in messages:
+        if message["role"] == "user":
+            chat_history_html += f'''
+            <div class="user-message">
+                <div class="message-bubble">
+                    {message["content"]}
+                </div>
+            </div>
+            '''
+        else:
+            chat_history_html += f'''
+            <div class="assistant-message">
+                <div class="message-bubble">
+                    {message["content"]}
+                </div>
+            </div>
+            '''
+    
     return f'''<!DOCTYPE html>
 <html>
 <head>
-    <title>Чат с продавцом: {product.name}</title>
+    <title>ЧАТ С ТОВАРОМ: {product.name}</title>
     <style>
         @keyframes backgroundFlash {{
             0% {{ background-color: #ffffff; }}
@@ -2944,6 +3045,9 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             audio.loop = true; // Зацикливаем воспроизведение
             audio.play().catch(e => console.log("Автовоспроизведение заблокировано:", e));
         }}
+        
+        // Воспроизводим музыку при загрузке страницы
+        window.addEventListener('load', playRandomMusic);
     </script>
 </head>
 <body>
