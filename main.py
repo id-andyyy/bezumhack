@@ -3298,29 +3298,61 @@ async def send_chat_message(product_id: int, request: Request, db: Session = Dep
         openrouter_messages.append({"role": msg["role"], "content": msg["content"]})
     
     # Отправляем запрос к API OpenRouter (DeepSeek v3 free)
-    api_response = requests.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": "Bearer OPENROUTER-API-KEY",  # Замените на ваш реальный ключ API
-            "HTTP-Referer": "https://bezumhack.ru",
-        },
-        json={
-            "model": "deepseek/deepseek-chat-v3",
-            "messages": openrouter_messages
-        }
-    )
-    
-    if api_response.status_code != 200:
-        # В случае ошибки возвращаем сообщение об ошибке
-        assistant_reply = "Извините, я сейчас не могу ответить. Попробуйте позже!"
-    else:
-        # Получаем ответ от API
-        try:
-            response_data = api_response.json()
-            assistant_reply = response_data["choices"][0]["message"]["content"]
-        except:
-            assistant_reply = "Произошла ошибка при обработке ответа. Попробуйте еще раз!"
+    try:
+        api_response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "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",
+            },
+            json={
+                "model": "deepseek/deepseek-chat:free",
+                "messages": openrouter_messages
+            },
+            timeout=10  # Добавляем таймаут для предотвращения зависания
+        )
+        
+        print(f"API статус код: {api_response.status_code}")
+        print(f"API ответ: {api_response.text}")
+        
+        if api_response.status_code != 200:
+            # Попробуем резервную модель, если основная не работает
+            try:
+                print("Пробуем резервную модель...")
+                api_response = requests.post(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": "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",
+                    },
+                    json={
+                        "model": "deepseek/deepseek-chat:free",  # Резервная модель
+                        "messages": openrouter_messages
+                    },
+                    timeout=10
+                )
+                
+                print(f"Резервный API статус код: {api_response.status_code}")
+                print(f"Резервный API ответ: {api_response.text}")
+                
+                if api_response.status_code != 200:
+                    assistant_reply = "Извините, я сейчас не могу ответить. Попробуйте позже!"
+                else:
+                    response_data = api_response.json()
+                    assistant_reply = response_data["choices"][0]["message"]["content"]
+            except Exception as e:
+                print(f"Ошибка с резервной моделью: {str(e)}")
+                assistant_reply = "Извините, сервис временно недоступен. Попробуйте позже!"
+        else:
+            try:
+                response_data = api_response.json()
+                assistant_reply = response_data["choices"][0]["message"]["content"]
+            except Exception as e:
+                print(f"Ошибка при обработке JSON: {str(e)}")
+                assistant_reply = "Произошла ошибка при обработке ответа. Попробуйте еще раз!"
+    except Exception as e:
+        print(f"Общая ошибка API: {str(e)}")
+        assistant_reply = "Сервис чата временно недоступен. Пожалуйста, попробуйте позже!"
     
     # Добавляем ответ ассистента в историю
     messages.append({"role": "assistant", "content": assistant_reply})
