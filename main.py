@@ -115,9 +115,9 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
     for product in products:
         product_image = ""
         if product.image_url:
-            product_image = f'<img src="{product.image_url}" alt="{product.name}" style="max-width:100%; height:auto; transform: skew(5deg, 10deg);">'
+            product_image = f'<a href="/product/{product.id}/html{username_param}"><img src="{product.image_url}" alt="{product.name}" style="max-width:100%; height:auto; transform: skew(5deg, 10deg);"></a>'
         elif product.gif_base64:
-            product_image = f'<img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" style="max-width:100%; height:auto; transform: skew(-10deg, 5deg);">'
+            product_image = f'<a href="/product/{product.id}/html{username_param}"><img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" style="max-width:100%; height:auto; transform: skew(-10deg, 5deg);"></a>'
             
         products_html += f'''
         <div class="item">
@@ -125,7 +125,7 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
             {product_image}
             <div class="item-price rotate-text">{product.price} руб.</div>
             <div class="left-align" style="font-family: 'Wingdings', cursive;">{product.description}</div>
-            <a href="/product/{product.id}{username_param}" style="text-decoration: none;"><button style="background-color:lime; font-weight:bold; margin-top:5px; transform: rotate({product.id * 5}deg);" class="shake">КУПИТЬ!</button></a>
+            <a href="/product/{product.id}/html{username_param}" style="text-decoration: none;"><button style="background-color:lime; font-weight:bold; margin-top:5px; transform: rotate({product.id * 5}deg);" class="shake">КУПИТЬ!</button></a>
         </div>
         '''
     auth_block = '''
@@ -423,6 +423,26 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
             100% {{ border-color: gold; }}
         }}
     </style>
+    <script>
+        // Массив с музыкальными файлами
+        const musicFiles = [
+            "https://www.dropbox.com/scl/fi/cvq4sc9yis7bw3hg3zboc/MACAN-ASPHALT-8.mp3?rlkey=l1qqivc27nfx0wqxrws7ycdq3&dl=1",
+            "https://www.dropbox.com/scl/fi/fun6i04anb8ee4m5vs1yr/Dmitriy-Malikov-5opka-Venom-Boy.mp3?rlkey=vo90el00nhcjvfxzrv8s414kj&dl=1",
+            "https://www.dropbox.com/scl/fi/oz2u759jg8s5ohl0qxgxp/Betsy-Sigma-Boy.mp3?rlkey=60ldz086k0np83b2i9a4egiyf&dl=1"
+        ];
+        
+        // Функция для выбора случайного файла из массива
+        function playRandomMusic() {{
+            const randomIndex = Math.floor(Math.random() * musicFiles.length);
+            const audio = new Audio(musicFiles[randomIndex]);
+            audio.volume = 0.5; // Устанавливаем громкость на 50%
+            audio.loop = true; // Зацикливаем воспроизведение
+            audio.play().catch(e => console.log("Автовоспроизведение заблокировано:", e));
+        }}
+        
+        // Воспроизводим музыку при загрузке страницы
+        window.addEventListener('load', playRandomMusic);
+    </script>
 </head>
 <body>
 
@@ -1471,16 +1491,16 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
     <title>СУПЕР ТОВАР: {product.name}</title>
     <style>
         @keyframes backgroundFlash {{
-            0% {{ background-color: #ffffff; }}
-            25% {{ background-color: #ffffff; }}
-            50% {{ background-color: #ffffff; }}
-            75% {{ background-color: #ffffff; }}
-            100% {{ background-color: #ffffff; }}
+            0% {{ background-color: #ff00ff; }}
+            25% {{ background-color: #00ffff; }}
+            50% {{ background-color: #ffff00; }}
+            75% {{ background-color: #ff0000; }}
+            100% {{ background-color: #ff00ff; }}
         }}
         
         @keyframes backgroundSpin {{
             0% {{ transform: rotate(0deg); }}
-            100% {{ transform: rotate(0deg); }}
+            100% {{ transform: rotate(360deg); }}
         }}
         
         body {{
@@ -1523,7 +1543,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             margin: 20px auto;
             max-width: 800px;
             background-color: #FFFFCC;
-            animation: none;
+            animation: backgroundFlash 2s infinite;
             box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
             position: relative;
             z-index: 1;
@@ -1535,20 +1555,20 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             margin: 10px auto;
             display: block;
             border: 8px ridge gold;
-            animation: none;
+            animation: borderColor 2s infinite;
         }}
         
         .epilepsy-image {{
-            animation: none;
-            filter: none;
+            animation: epilepsy 0.5s infinite;
+            filter: hue-rotate(45deg);
         }}
         
         @keyframes epilepsy {{
-            0% {{ filter: none; }}
-            25% {{ filter: none; }}
-            50% {{ filter: none; }}
-            75% {{ filter: none; }}
-            100% {{ filter: none; }}
+            0% {{ filter: hue-rotate(0deg); }}
+            25% {{ filter: hue-rotate(90deg); }}
+            50% {{ filter: hue-rotate(180deg); }}
+            75% {{ filter: hue-rotate(270deg); }}
+            100% {{ filter: hue-rotate(360deg); }}
         }}
         
         @keyframes borderColor {{
@@ -1558,20 +1578,8 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             100% {{ border-color: gold; }}
         }}
         
-        .zakadrit-button {{
-            position: fixed;
-            bottom: 40%;
-            right: 40%;
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff0000);
-            background-size: 400% 400%;
-            animation: gradientBG 3s ease infinite, shake 0.3s infinite;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 32px;
+        .product-name {{
+            font-size: 36px;
             font-weight: bold;
             border: 10px solid;
             border-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) 1;
@@ -1829,193 +1837,68 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             }}
         }}
         
-        function handleEnd(clientX, clientY) {{
-            if (!isDragging) return;
-            
-            const card = document.querySelector('.tinder-card.active');
-            if (!card) return;
-            
-            isDragging = false;
-            
-            const deltaX = clientX - startX;
-            
-            // Возвращаем transition для анимации
-            card.style.transition = '';
-            
-            // Если перетащили достаточно далеко вправо - лайк
-            if (deltaX > swipeThreshold) {{
-                likeProduct();
-            }} 
-            // Если перетащили достаточно далеко влево - дизлайк
-            else if (deltaX < -swipeThreshold) {{
-                dislikeProduct();
-            }} 
-            // Иначе возвращаем карточку на место
-            else {{
-                card.style.transform = '';
-                card.style.boxShadow = '';
-            }}
+        .blink {{
+            animation: blink 0.5s infinite;
         }}
         
-        // Инициализация при загрузке страницы
-        window.onload = function() {{
-            initCards();
-            updateProductLists();
-            
-            // Обработчики событий мыши
-            document.addEventListener('mousedown', function(e) {{
-                const card = document.querySelector('.tinder-card.active');
-                if (card && card.contains(e.target)) {{
-                    handleStart(e.clientX, e.clientY);
-                }}
-            }});
-            
-            document.addEventListener('mousemove', function(e) {{
-                handleMove(e.clientX, e.clientY);
-            }});
-            
-            document.addEventListener('mouseup', function(e) {{
-                handleEnd(e.clientX, e.clientY);
-            }});
-            
-            // Обработчики сенсорных событий для мобильных устройств
-            document.addEventListener('touchstart', function(e) {{
-                const card = document.querySelector('.tinder-card.active');
-                if (card && card.contains(e.target)) {{
-                    const touch = e.touches[0];
-                    handleStart(touch.clientX, touch.clientY);
-                    e.preventDefault(); // Предотвращаем скролл страницы
-                }}
-            }}, {{ passive: false }});
-            
-            document.addEventListener('touchmove', function(e) {{
-                const touch = e.touches[0];
-                handleMove(touch.clientX, touch.clientY);
-                e.preventDefault(); // Предотвращаем скролл страницы
-            }}, {{ passive: false }});
-            
-            document.addEventListener('touchend', function(e) {{
-                if (e.changedTouches.length > 0) {{
-                    const touch = e.changedTouches[0];
-                    handleEnd(touch.clientX, touch.clientY);
-                }}
-            }});
-        }};
-    </script>
-    
-    <footer style="background-color: #CCFFCC; padding: 20px; text-align: center; border: 4px solid green; animation: backgroundFlash 3s infinite; margin-top: 30px;">
-        <div class="rainbow-text" style="font-size: 24px;">© 2025 SEXberries - Все права защищены</div>
-        <div class="rainbow-text">Тел: 8-800-ПАРОЛЬ-АДМИНА УДАЛИТЬ НЕ ЗАБЫТЬ | Email: admin@example.com</div>
-        <div class="blink" style="color:red; font-weight:bold; margin-top:10px; font-size: 28px; transform: rotate(-3deg);">ОПЛАТИТЬ АЛИМЕНТЫыы не забыть</div>
-    </footer>
-    
+        @keyframes blink {{
+            0% {{ opacity: 1; }}
+            50% {{ opacity: 0; }}
+            100% {{ opacity: 1; }}
+        }}
+    </style>
     <script>
-        // Код для создания и управления тараканами
-        function createCockroach() {{
-            const cockroach = document.createElement('div');
-            cockroach.className = 'cockroach';
-            
-            // Случайное начальное положение (слева или справа)
-            const startFromLeft = Math.random() > 0.5;
-            const top = Math.random() * (window.innerHeight - 50);
-            
-            // Задаём начальное положение
-            cockroach.style.top = `${{top}}px`;
-            cockroach.style.left = startFromLeft ? '-50px' : `${{window.innerWidth}}px`;
-            
-            // Случайное направление движения
-            const directionX = startFromLeft ? 1 : -1;
-            const directionY = Math.random() > 0.5 ? 1 : -1;
-            const speedX = (Math.random() * 3 + 2); // Скорость от 2 до 5 пикселей в кадр
-            const speedY = (Math.random() * 2); // Небольшое отклонение по вертикали
-            
-            // Отражаем таракана в зависимости от направления движения
-            if (!startFromLeft) {{
-                cockroach.style.transform = 'scaleX(-1)';
-            }}
-            
-            // Добавляем на страницу
-            document.body.appendChild(cockroach);
-            
-            // Функция для движения таракана
-            function moveCockroach() {{
-                // Текущее положение
-                const currentLeft = parseFloat(cockroach.style.left);
-                const currentTop = parseFloat(cockroach.style.top);
-                
-                // Новое положение
-                const newLeft = currentLeft + directionX * speedX;
-                const newTop = currentTop + directionY * speedY;
-                
-                // Проверяем, не вышел ли таракан за пределы экрана
-                if (newLeft < -100 || newLeft > window.innerWidth + 100 || 
-                    newTop < -100 || newTop > window.innerHeight + 100) {{
-                    // Таракан убежал, удаляем его
-                    if (cockroach.parentNode) {{
-                        cockroach.parentNode.removeChild(cockroach);
-                    }}
-                    return;
-                }}
-                
-                // Обновляем положение
-                cockroach.style.left = `${{newLeft}}px`;
-                cockroach.style.top = `${{newTop}}px`;
-                
-                // Вызываем эту функцию снова в следующем кадре
-                if (cockroach.parentNode) {{
-                    requestAnimationFrame(moveCockroach);
-                }}
-            }}
-            
-            // Обработчик клика для "убийства" таракана
-            cockroach.addEventListener('click', function() {{
-                cockroach.classList.add('squished');
-                // Удаляем таракана после анимации
-                setTimeout(() => {{
-                    if (cockroach.parentNode) {{
-                        cockroach.parentNode.removeChild(cockroach);
-                    }}
-                }}, 500);
-            }});
-            
-            // Начинаем движение
-            requestAnimationFrame(moveCockroach);
-            
-            // Возвращаем созданный элемент
-            return cockroach;
+        // Массив с музыкальными файлами
+        const musicFiles = [
+            "https://www.dropbox.com/scl/fi/cvq4sc9yis7bw3hg3zboc/MACAN-ASPHALT-8.mp3?rlkey=l1qqivc27nfx0wqxrws7ycdq3&dl=1",
+            "https://www.dropbox.com/scl/fi/fun6i04anb8ee4m5vs1yr/Dmitriy-Malikov-5opka-Venom-Boy.mp3?rlkey=vo90el00nhcjvfxzrv8s414kj&dl=1",
+            "https://www.dropbox.com/scl/fi/oz2u759jg8s5ohl0qxgxp/Betsy-Sigma-Boy.mp3?rlkey=60ldz086k0np83b2i9a4egiyf&dl=1"
+        ];
+        
+        // Функция для выбора случайного файла из массива
+        function playRandomMusic() {{
+            const randomIndex = Math.floor(Math.random() * musicFiles.length);
+            const audio = new Audio(musicFiles[randomIndex]);
+            audio.volume = 0.5; // Устанавливаем громкость на 50%
+            audio.loop = true; // Зацикливаем воспроизведение
+            audio.play().catch(e => console.log("Автовоспроизведение заблокировано:", e));
         }}
         
-        // Создаём несколько тараканов сразу
-        function spawnInitialCockroaches() {{
-            const count = Math.floor(Math.random() * 3) + 3; // 3-5 тараканов
-            for (let i = 0; i < count; i++) {{
-                createCockroach();
-            }}
-        }}
-        
-        // Периодически создаём новых тараканов
-        function startCockroachSpawner() {{
-            // Создаём начальных тараканов
-            spawnInitialCockroaches();
-            
-            // Через случайные промежутки времени создаём новых
-            setInterval(() => {{
-                // С небольшой вероятностью создаём сразу несколько тараканов
-                if (Math.random() < 0.3) {{
-                    // Создаём "семью" тараканов (2-4)
-                    const family = Math.floor(Math.random() * 3) + 2;
-                    for (let i = 0; i < family; i++) {{
-                        setTimeout(() => createCockroach(), i * 200); // С небольшой задержкой между ними
-                    }}
-                }} else {{
-                    createCockroach();
-                }}
-            }}, 2000 + Math.random() * 3000); // Каждые 2-5 секунд
-        }}
-        
-        // Запускаем при загрузке страницы
-        window.addEventListener('load', startCockroachSpawner);
+        // Воспроизводим музыку при загрузке страницы
+        window.addEventListener('load', playRandomMusic);
     </script>
+</head>
+<body>
+    <div class="header">
+        <h1 class="blink" style="font-size: 50px; color: red; text-shadow: 3px 3px 0 yellow;">ДЕТАЛЬНАЯ ИНФОРМАЦИЯ О ТОВАРЕ!!!</h1>
+        <div style="font-size: 30px; font-weight: bold; color: blue; text-shadow: 0 0 5px yellow;" class="shake">
+            КУПИ НЕМЕДЛЕННО ИЛИ ПОЖАЛЕЕШЬ!!!
+        </div>
+    </div>
+    
+    <div class="nav">
+        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
+        <a href="/products{username_param}" class="rainbow-text">Товары</a> | 
+        <a href="/login-page" class="rainbow-text">Войти</a> | 
+        <a href="/register-page" class="rainbow-text">Регистрация</a> |
+        <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
+        <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
+    </div>
+    
+    <marquee scrollamount="20" behavior="alternate" style="background-color: red; color: yellow; font-size: 36px; font-weight: bold; padding: 15px; border: 5px dashed blue;">
+        !!! ТОВАР ОБАЛДЕННЫЙ !!! СКИДКА {product.id * 12}% !!! КУПИ СЕЙЧАС !!!
+    </marquee>
+    
+    <div class="product-container">
+        <div class="product-name">{product.name}</div>
+        {product_image}
+        <div class="product-price">{product.price} руб.</div>
+        <div class="product-description">{product.description}</div>
+        
+        <button class="buy-button" onclick="alert('ПОЗДРАВЛЯЕМ!!! ВЫ КУПИЛИ ТОВАР! С ВАШЕЙ КАРТЫ СПИСАНО {product.price * 10} РУБЛЕЙ!')">КУПИТЬ НЕМЕДЛЕННО!!!</button>
+        
+        {f'<div class="secret-info">Секретная информация: {product.secret_info}</div>' if product.secret_info else ''}
+    </div>
 </body>
 </html>'''
 
@@ -2389,40 +2272,27 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
         .chat-button:hover {{
             background-color: #66FF66;
         }}
-        
-        .zakadrit-button {{
-            position: fixed;
-            bottom: 40%;
-            right: 40%;
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(45deg, #ff00ff, #00ffff, #ffff00, #ff0000);
-            background-size: 400% 400%;
-            animation: gradientBG 3s ease infinite, shake 0.3s infinite;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 32px;
-            font-weight: bold;
-            border: 10px solid;
-            border-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) 1;
-            cursor: pointer;
-            box-shadow: 0 0 50px rgba(255, 0, 255, 1);
-            z-index: 9999;
-            border-radius: 50%;
-            text-align: center;
-            color: white;
-            text-shadow: 2px 2px 4px black;
-            text-decoration: none;
-        }}
-        
-        @keyframes gradientBG {{
-            0% {{ background-position: 0% 50%; }}
-            50% {{ background-position: 100% 50%; }}
-            100% {{ background-position: 0% 50%; }}
-        }}
     </style>
+    <script>
+        // Массив с музыкальными файлами
+        const musicFiles = [
+            "https://www.dropbox.com/scl/fi/cvq4sc9yis7bw3hg3zboc/MACAN-ASPHALT-8.mp3?rlkey=l1qqivc27nfx0wqxrws7ycdq3&dl=1",
+            "https://www.dropbox.com/scl/fi/fun6i04anb8ee4m5vs1yr/Dmitriy-Malikov-5opka-Venom-Boy.mp3?rlkey=vo90el00nhcjvfxzrv8s414kj&dl=1",
+            "https://www.dropbox.com/scl/fi/oz2u759jg8s5ohl0qxgxp/Betsy-Sigma-Boy.mp3?rlkey=60ldz086k0np83b2i9a4egiyf&dl=1"
+        ];
+        
+        // Функция для выбора случайного файла из массива
+        function playRandomMusic() {{
+            const randomIndex = Math.floor(Math.random() * musicFiles.length);
+            const audio = new Audio(musicFiles[randomIndex]);
+            audio.volume = 0.5; // Устанавливаем громкость на 50%
+            audio.loop = true; // Зацикливаем воспроизведение
+            audio.play().catch(e => console.log("Автовоспроизведение заблокировано:", e));
+        }}
+        
+        // Воспроизводим музыку при загрузке страницы
+        window.addEventListener('load', playRandomMusic);
+    </script>
 </head>
 <body>
     <div class="header">
@@ -2433,8 +2303,8 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
     </div>
     
     <div class="nav">
-        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
-        <a href="/products/{username_param}" class="rainbow-text">Товары</a> | 
+        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
+        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
         <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
@@ -3156,6 +3026,26 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             color: #666;
         }}
     </style>
+    <script>
+        // Массив с музыкальными файлами
+        const musicFiles = [
+            "https://www.dropbox.com/scl/fi/cvq4sc9yis7bw3hg3zboc/MACAN-ASPHALT-8.mp3?rlkey=l1qqivc27nfx0wqxrws7ycdq3&dl=1",
+            "https://www.dropbox.com/scl/fi/fun6i04anb8ee4m5vs1yr/Dmitriy-Malikov-5opka-Venom-Boy.mp3?rlkey=vo90el00nhcjvfxzrv8s414kj&dl=1",
+            "https://www.dropbox.com/scl/fi/oz2u759jg8s5ohl0qxgxp/Betsy-Sigma-Boy.mp3?rlkey=60ldz086k0np83b2i9a4egiyf&dl=1"
+        ];
+        
+        // Функция для выбора случайного файла из массива
+        function playRandomMusic() {{
+            const randomIndex = Math.floor(Math.random() * musicFiles.length);
+            const audio = new Audio(musicFiles[randomIndex]);
+            audio.volume = 0.5; // Устанавливаем громкость на 50%
+            audio.loop = true; // Зацикливаем воспроизведение
+            audio.play().catch(e => console.log("Автовоспроизведение заблокировано:", e));
+        }}
+        
+        // Воспроизводим музыку при загрузке страницы
+        window.addEventListener('load', playRandomMusic);
+    </script>
 </head>
 <body>
     <div class="header">
