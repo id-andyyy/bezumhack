@@ -2204,7 +2204,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             position: absolute;
             width: 200px;
             height: 200px;
-            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
+            background-image: url('https://s00.yaplakal.com/pics/pics_original/5/3/9/14351935.gif');
             background-size: contain;
             background-repeat: no-repeat;
             z-index: 9999;
