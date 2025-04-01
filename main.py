@@ -1130,19 +1130,6 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
         
-        body:before {{
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
-            opacity: 0.7;
-            z-index: -1;
-            animation: none;
-            transform-origin: center center;
-        }}
         
         .header {{
             text-align: center;
@@ -1508,19 +1495,6 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
         
-        body:before {{
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
-            opacity: 0.7;
-            z-index: -1;
-            animation: none;
-            transform-origin: center center;
-        }}
         
         .header {{
             text-align: center;
@@ -2126,19 +2100,6 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
         
-        body:before {{
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
-            opacity: 0.7;
-            z-index: -1;
-            animation: none;
-            transform-origin: center center;
-        }}
         
         .header {{
             text-align: center;
@@ -2981,19 +2942,7 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
         
-        body:before {{
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
-            opacity: 0.7;
-            z-index: -1;
-            animation: none;
-            transform-origin: center center;
-        }}
+        
         
         .header {{
             text-align: center;
