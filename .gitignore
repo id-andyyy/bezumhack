@@ -2,7 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-app.db
 # C extensions
 *.so
 
@@ -58,8 +57,6 @@ cover/
 # Django stuff:
 *.log
 local_settings.py
-db.sqlite3
-db.sqlite3-journal
 
 # Flask stuff:
 instance/
@@ -173,15 +170,3 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# База данных
-*.db
-*.db-shm
-*.db-wal
-*.sqlite
-*.sqlite3
-*.sqlite3-shm
-*.sqlite3-wal
-*.sqlitedb
-*.sql
-*.bak
-database.ini
