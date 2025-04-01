@@ -3289,12 +3289,22 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
         // Функция добавления сообщения в чат
         function addMessage(role, content) {{
             if (role !== 'user') {{
-              // Создаем и воспроизводим речь
+              // Создаем и воспроизводим эмоциональную речь
               const speech = new SpeechSynthesisUtterance(content);
               speech.lang = 'ru-RU';
               speech.volume = 1;
-              speech.rate = 1;
-              speech.pitch = 1;
+              
+              // Случайная скорость речи для эмоциональности
+              speech.rate = 0.8 + Math.random() * 0.6; // от 0.8 до 1.4
+              
+              // Случайная высота тона для выразительности
+              speech.pitch = 0.8 + Math.random() * 0.8; // от 0.8 до 1.6
+              
+              // Добавляем случайные паузы для драматического эффекта
+              const processedText = content.replace(/[.!?]/g, match => match + ' ... ');
+              speech.text = processedText;
+              
+              // Воспроизводим с эмоциями
               window.speechSynthesis.speak(speech);
             }}
             
@@ -3372,7 +3382,7 @@ async def send_chat_message(product_id: int, request: Request, db: Session = Dep
     
     # Строим историю сообщений для запроса к API
     openrouter_messages = [
-        {"role": "system", "content": f"Ты - товар из интернет-магазина. Вот информация о тебе:\n{product_context}\n\nОтвечай на все вопросы пользователя от имени товара. Будь веселым, неожиданным и немного странным. Иногда рассказывай какие-то странные или забавные секретные факты о себе. Не отрицай, что ты товар. Ты будешь на сайте знакомств"}
+        {"role": "system", "content": f"Ты - товар из интернет-магазина. Ты зашел на сайт знакомств. Отвечай недлинными сообщениями (до 100 слов, но лучше примерно 25). Вот информация о тебе:\n{product_context}. С тобой "}
     ]
     
     # Добавляем последние 10 сообщений (если есть)
