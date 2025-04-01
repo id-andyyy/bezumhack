@@ -56,7 +56,7 @@ def verify_credentials(credentials: HTTPBasicCredentials, db: Session):
     return user
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request, db: Session = Depends(get_db)):
+async def home(request: Request, db: Session = Depends(get_db), username: Optional[str] = None):
     # Получаем все товары
     products = db.query(models.User).filter(models.User.is_product == 1).all()
     
@@ -78,6 +78,35 @@ async def home(request: Request, db: Session = Depends(get_db)):
             <button style="background-color:lime; font-weight:bold; margin-top:5px;">КУПИТЬ!</button>
         </div>
         '''
+    
+    # Блок авторизации в зависимости от наличия пользователя
+    auth_block = '''
+    <div>
+        <a href="/register-page">Регистрация</a> | 
+        <a href="/login-page">Войти</a> |
+        <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
+    </div>
+    '''
+    
+    # Получаем параметр username из URL (плохая практика - не проверяем авторизацию)
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
+        user = db.query(models.User).filter(
+            models.User.username == url_username,
+            models.User.is_product == 0
+        ).first()
+        if user:
+            # Если пользователь найден, меняем блок авторизации
+            auth_block = f'''
+            <div style="background-color: #CCFFCC; padding: 5px; border: 2px dotted blue;">
+                <div class="blink" style="color:green; font-weight:bold;">ВЫ ВОШЛИ КАК: {user.username}</div>
+                <a href="/protected-page?username={user.username}">Личный кабинет</a> |
+                <a href="/logout">Выйти</a> |
+                <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
+            </div>
+            '''
     
     # Возвращаем весь HTML-код напрямую из Python
     return f'''<!DOCTYPE html>
@@ -229,15 +258,17 @@ async def home(request: Request, db: Session = Depends(get_db)):
 <body>
     <div class="marquee">
         <div class="marquee-content">
-            !!! ТОВАРЫ БЕЗ РЕГИСТРАЦИИ И СМС !!! СКИДКА 90% НА ВСЕ ТОВАРЫ !!! ТОЛЬКО СЕГОДНЯ !!! ДОСТАВКА БЕСПЛАТНО !!! ЗВОНИТЕ ПРЯМО СЕЙЧАС !!! НЕВЕРОЯТНЫЕ ЦЕНЫ !!! АДМИН ПАРОЛЬ admin admin !!! 
+            !!! ТОВАРЫ БЕЗ РЕГИСТРАЦИИ И СМС !!! СКИДКА 90% НА ВСЕ ТОВАРЫ !!! ТОЛЬКО СЕГОДНЯ !!! ДОСТАВКА БЕСПЛАТНО !!! ЗВОНИТЕ ПРЯМО СЕЙЧАС !!! НЕВЕРОЯТНЫЕ ЦЕНЫ !!! НЕ ЗАБЫТЬ УДАЛИТЬ ИЗ КОДА АДМИН ПАРОЛЬ admin admin !!! 
         </div>
     </div>
     
     <table cellpadding="0" cellspacing="0" border="0">
         <tr>
             <td width="20%" valign="top">
-                <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Лого" style="float:left; margin-right:5px; width:80px; height:80px;">
-                <div class="logo">МЕГАмагазин<span class="blink">!!!</span></div>
+                <a href="/{username_param}">
+                    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Лого" style="float:left; margin-right:5px; width:80px; height:80px;">
+                    <div class="logo">МЕГАмагазин<span class="blink">!!!</span></div>
+                </a>
             </td>
             <td width="50%" align="center">
                 <img src="https://web.archive.org/web/20090830181814/http://geocities.com/ResearchTriangle/Campus/5288/worknew.gif" alt="Under Construction" style="height:40px;">
@@ -252,11 +283,7 @@ async def home(request: Request, db: Session = Depends(get_db)):
                         <span class="rotate">★</span> ПОИСК <span class="rotate">★</span>
                     </div>
                 </div>
-                <div>
-                    <a href="/register-page">Регистрация</a> | 
-                    <a href="/login-page">Войти</a> |
-                    <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
-                </div>
+                {auth_block}
             </td>
         </tr>
     </table>
@@ -264,8 +291,8 @@ async def home(request: Request, db: Session = Depends(get_db)):
     <table cellpadding="0" cellspacing="0" border="0" style="margin-top:2px;">
         <tr>
             <td bgcolor="#00FFFF" style="padding:3px;">
-                <span class="nav-item" style="font-size:16px; font-weight:bold;">ГЛАВНАЯ</span> |
-                <span class="nav-item">ТОВАРЫ</span> |
+                <a href="/{username_param}" class="nav-item" style="font-size:16px; font-weight:bold;">ГЛАВНАЯ</a> |
+                <a href="/products{username_param}" class="nav-item">ТОВАРЫ</a> |
                 <span class="nav-item blink" style="color: red; font-weight:bold;">РАСПРОДАЖА</span> |
                 <span class="nav-item">О НАС</span> |
                 <span class="nav-item">КОНТАКТЫ</span>
@@ -501,7 +528,9 @@ def register(
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return RedirectResponse(url="/login-page", status_code=status.HTTP_303_SEE_OTHER)
+    
+    # После регистрации сразу перенаправляем на главную с именем пользователя
+    return RedirectResponse(url=f"/?username={username}", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post("/login-form")
 def login_form(
@@ -525,7 +554,8 @@ def login_form(
         error = "Неверный пароль"
         return RedirectResponse(url=f"/login-page?error={error}", status_code=status.HTTP_303_SEE_OTHER)
     
-    return RedirectResponse(url="/protected-page", status_code=status.HTTP_303_SEE_OTHER)
+    # Перенаправляем на главную страницу с указанием имени пользователя в URL
+    return RedirectResponse(url=f"/?username={username}", status_code=status.HTTP_303_SEE_OTHER)
 
 @app.post("/login")
 def login(
@@ -537,68 +567,74 @@ def login(
 
 @app.get("/protected-page", response_class=HTMLResponse)
 async def protected_page(request: Request):
-    return '''<!DOCTYPE html>
+    # Получаем параметр username из URL
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
+    
+    return f'''<!DOCTYPE html>
 <html>
 <head>
     <title>Личный кабинет</title>
     <style>
-        body {
+        body {{
             font-family: Comic Sans MS, cursive;
             background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
             margin: 0;
             padding: 20px;
-        }
-        .nav {
+        }}
+        .nav {{
             margin-bottom: 20px;
             background-color: #CCFFFF;
             padding: 5px;
             text-align: center;
             border: 3px dashed blue;
-        }
-        .nav a {
+        }}
+        .nav a {{
             color: blue;
             text-decoration: underline;
             margin: 0 10px;
             font-weight: bold;
-        }
-        .user-info {
+        }}
+        .user-info {{
             margin-bottom: 20px;
             padding: 10px;
             border: 3px dotted purple;
             background-color: #FFFFCC;
-        }
-        .product-image {
+        }}
+        .product-image {{
             max-width: 200px;
             max-height: 150px;
             margin: 5px 0;
             border: 3px ridge gold;
-        }
-        h1, h2, h3 {
+        }}
+        h1, h2, h3 {{
             color: #FF00FF;
             text-shadow: 1px 1px 0 yellow;
-        }
-        .blink {
+        }}
+        .blink {{
             animation: blinker 0.8s linear infinite;
-        }
-        @keyframes blinker {
-            50% { opacity: 0; }
-        }
-        ul {
+        }}
+        @keyframes blinker {{
+            50% {{ opacity: 0; }}
+        }}
+        ul {{
             list-style-type: none;
             padding: 0;
-        }
-        li {
+        }}
+        li {{
             border: 2px solid green;
             margin-bottom: 10px;
             padding: 10px;
             background-color: #CCFFCC;
-        }
+        }}
     </style>
 </head>
 <body>
     <div class="nav">
-        <a href="/">Главная</a> | 
-        <a href="/products">Товары</a> | 
+        <a href="/{username_param}">Главная</a> | 
+        <a href="/products{username_param}">Товары</a> | 
         <a href="/logout">Выйти</a> |
         <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
     </div>
@@ -622,89 +658,89 @@ async def protected_page(request: Request):
         // Небезопасно: отправка запроса без проверки авторизации
         fetch('/products-by-user?username=' + username)
             .then(response => response.json())
-            .then(data => {
+            .then(data => {{
                 const productsDiv = document.getElementById('userProducts');
-                if (data.products && data.products.length > 0) {
+                if (data.products && data.products.length > 0) {{
                     let html = '<ul>';
-                    data.products.forEach(product => {
+                    data.products.forEach(product => {{
                         // колонки таблицы users: 
                         // id, username, password, admin, credit_card, is_product, name, price, description, owner_id, secret_info, image_url, gif_base64
                         const imageHtml = product[11] ? 
-                            `<img src="${product[11]}" alt="Изображение товара" class="product-image">` : '';
+                            `<img src="${{product[11]}}" alt="Изображение товара" class="product-image">` : '';
                         
                         const gifHtml = product[12] ? 
-                            `<img src="data:image/gif;base64,${product[12]}" alt="GIF товара" class="product-image">` : '';
+                            `<img src="data:image/gif;base64,${{product[12]}}" alt="GIF товара" class="product-image">` : '';
                         
                         html += `<li>
-                            <strong style="color:blue; font-size:18px;">${product[6]}</strong> - <span style="color:red; font-weight:bold;">${product[7]} руб.</span>
-                            <p>${product[8]}</p>
-                            ${imageHtml}
-                            ${gifHtml}
-                            <p>Секретные данные: <span style="color:green;">${product[10] || 'нет'}</span></p>
+                            <strong style="color:blue; font-size:18px;">${{product[6]}}</strong> - <span style="color:red; font-weight:bold;">${{product[7]}} руб.</span>
+                            <p>${{product[8]}}</p>
+                            ${{imageHtml}}
+                            ${{gifHtml}}
+                            <p>Секретные данные: <span style="color:green;">${{product[10] || 'нет'}}</span></p>
                         </li>`;
-                    });
+                    }});
                     html += '</ul>';
                     productsDiv.innerHTML = html;
-                } else {
+                }} else {{
                     productsDiv.innerHTML = '<p style="color:red; font-weight:bold;">У вас нет товаров</p>';
-                }
-            })
-            .catch(error => {
+                }}
+            }})
+            .catch(error => {{
                 console.error('Ошибка:', error);
                 document.getElementById('userProducts').innerHTML = '<p style="color:red; font-weight:bold;">Ошибка загрузки товаров</p>';
-            });
+            }});
 
         // Небезопасно: прямой доступ к базе данных через админский интерфейс
         fetch('/admin-panel?admin=1')
-            .then(response => {
-                if (!response.ok) {
+            .then(response => {{
+                if (!response.ok) {{
                     throw new Error('Ошибка доступа');
-                }
+                }}
                 return response.json();
-            })
-            .then(data => {
+            }})
+            .then(data => {{
                 const userDataDiv = document.getElementById('userData');
                 // Находим текущего пользователя
                 const currentUser = data.users.find(user => user.username === username);
-                if (currentUser) {
+                if (currentUser) {{
                     userDataDiv.innerHTML = `
-                        <p>ID: <span style="color:blue;">${currentUser.id}</span></p>
-                        <p>Имя пользователя: <span style="color:blue;">${currentUser.username}</span></p>
-                        <p>Пароль: <span style="color:red;">${currentUser.password}</span></p>
-                        <p>Номер карты: <span style="color:red;">${currentUser.credit_card || 'не указан'}</span></p>
+                        <p>ID: <span style="color:blue;">${{currentUser.id}}</span></p>
+                        <p>Имя пользователя: <span style="color:blue;">${{currentUser.username}}</span></p>
+                        <p>Пароль: <span style="color:red;">${{currentUser.password}}</span></p>
+                        <p>Номер карты: <span style="color:red;">${{currentUser.credit_card || 'не указан'}}</span></p>
                     `;
 
                     // Также выводим все товары этого пользователя
                     const userProducts = data.products.filter(p => p.owner_id === currentUser.id);
-                    if (userProducts.length > 0) {
+                    if (userProducts.length > 0) {{
                         let productsHTML = '<h3 class="blink">Все мои товары из админ-панели:</h3><ul>';
-                        userProducts.forEach(product => {
+                        userProducts.forEach(product => {{
                             // Небезопасно добавляем изображения без проверки URL
                             const imageHtml = product.image_url ? 
-                                `<img src="${product.image_url}" alt="Изображение товара" class="product-image">` : '';
+                                `<img src="${{product.image_url}}" alt="Изображение товара" class="product-image">` : '';
                             
                             // Небезопасно отображаем GIF из base64 без проверки содержимого
                             const gifHtml = product.gif_base64 ? 
-                                `<img src="data:image/gif;base64,${product.gif_base64}" alt="GIF товара" class="product-image">` : '';
+                                `<img src="data:image/gif;base64,${{product.gif_base64}}" alt="GIF товара" class="product-image">` : '';
                             
                             productsHTML += `<li>
-                                <strong style="color:blue; font-size:18px;">${product.name}</strong> - <span style="color:red; font-weight:bold;">${product.price} руб.</span>
-                                ${imageHtml}
-                                ${gifHtml}
-                                <p>Секретные данные: <span style="color:green;">${product.secret_info || 'нет'}</span></p>
+                                <strong style="color:blue; font-size:18px;">${{product.name}}</strong> - <span style="color:red; font-weight:bold;">${{product.price}} руб.</span>
+                                ${{imageHtml}}
+                                ${{gifHtml}}
+                                <p>Секретные данные: <span style="color:green;">${{product.secret_info || 'нет'}}</span></p>
                             </li>`;
-                        });
+                        }});
                         productsHTML += '</ul>';
                         document.getElementById('userProducts').innerHTML = productsHTML;
-                    }
-                } else {
+                    }}
+                }} else {{
                     userDataDiv.innerHTML = '<p style="color:red; font-weight:bold;">Пользователь не найден</p>';
-                }
-            })
-            .catch(error => {
+                }}
+            }})
+            .catch(error => {{
                 console.error('Ошибка:', error);
                 document.getElementById('userData').innerHTML = '<p style="color:red; font-weight:bold;">Ошибка загрузки данных пользователя</p>';
-            });
+            }});
     </script>
 </body>
 </html>'''
@@ -716,8 +752,8 @@ def protected_route(credentials: HTTPBasicCredentials = Depends(security), db: S
 
 @app.get("/logout", response_class=HTMLResponse)
 async def logout():
-    response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    return response
+    # Просто перенаправляем на главную без параметров, чтобы "выйти"
+    return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
 @app.get("/products", response_class=HTMLResponse)
@@ -795,6 +831,12 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
         <button type="button" onclick="executeQuery()">Найти через JavaScript</button>
     </form>
     '''
+    
+    # Получаем параметр username из URL (для сохранения авторизации)
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
     
     return f'''<!DOCTYPE html>
 <html>
@@ -895,10 +937,10 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
     </div>
     
     <div class="nav">
-        <a href="/">Главная</a> | 
+        <a href="/{username_param}">Главная</a> | 
         <a href="/login-page">Войти</a> | 
         <a href="/register-page">Регистрация</a> |
-        <a href="/protected-page">Личный кабинет</a> |
+        <a href="/protected-page{username_param}">Личный кабинет</a> |
         <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
     </div>
 

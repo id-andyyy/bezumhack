@@ -1,0 +1,34 @@
+    # Получаем параметр username из URL (плохая практика - не проверяем авторизацию)
+    url_username = request.query_params.get('username')
+    username_param = ""
+    if url_username:
+        username_param = f"?username={url_username}"
+        user = db.query(models.User).filter(
+            models.User.username == url_username,
+            models.User.is_product == 0
+        ).first()
+        if user:
+            # Если пользователь найден, меняем блок авторизации
+            auth_block = f'''
+            <div style="background-color: #CCFFCC; padding: 5px; border: 2px dotted blue;">
+                <div class="blink" style="color:green; font-weight:bold;">ВЫ ВОШЛИ КАК: {user.username}</div>
+                <a href="/protected-page?username={user.username}">Личный кабинет</a> |
+                <a href="/logout">Выйти</a> |
+                <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
+            </div>
+            '''
+            
+    # Измененная навигационная панель с учетом параметра пользователя
+    nav_bar = f'''
+    <table cellpadding="0" cellspacing="0" border="0" style="margin-top:2px;">
+        <tr>
+            <td bgcolor="#00FFFF" style="padding:3px;">
+                <a href="/{username_param}" class="nav-item" style="font-size:16px; font-weight:bold;">ГЛАВНАЯ</a> |
+                <a href="/products{username_param}" class="nav-item">ТОВАРЫ</a> |
+                <span class="nav-item blink" style="color: red; font-weight:bold;">РАСПРОДАЖА</span> |
+                <span class="nav-item">О НАС</span> |
+                <span class="nav-item">КОНТАКТЫ</span>
+            </td>
+        </tr>
+    </table>
+    ''' 
