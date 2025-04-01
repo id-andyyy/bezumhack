@@ -457,7 +457,7 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
         style.innerHTML = `
             @keyframes pulse {{
                 0% {{ transform: scale(1); }}
-                100% {{ transform: scale(2); }}
+                100% {{ transform: scale(1.5); }}
             }}
         `;
         document.head.appendChild(style);
