@@ -491,7 +491,7 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
         </div>
     </div>
     
-    <a href="/tinder-swipe{username_param}" class="zakadrit-button">
+    <a href="/tinder-swipe" class="zakadrit-button">
         <span>ЗАКАДРИТЬ</span>
         <span>СУЧКУ!</span>
     </a>
@@ -810,8 +810,8 @@ async def protected_page(request: Request):
 </head>
 <body>
     <div class="nav">
-        <a href="/{username_param}">Главная</a> | 
-        <a href="/products{username_param}">Товары</a> | 
+        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
+        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
         <a href="/logout">Выйти</a> |
         <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
     </div>
@@ -1261,10 +1261,11 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
     </div>
     
     <div class="nav">
-        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
+        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
+        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
-        <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
+        <a href="/protected-page{{username_param}}" class="rainbow-text">Личный кабинет</a> |
         <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
 
@@ -1273,7 +1274,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
     </marquee>
 
     <div class="big-button-container">
-        <a href="/tinder-swipe{username_param}" class="big-square-button">
+        <a href="/tinder-swipe{{username_param}}" class="big-square-button">
             <span style="font-family: 'Comic Sans MS', cursive;">З</span><span style="font-family: 'Arial Black', sans-serif;">А</span><span style="font-family: 'Impact', sans-serif;">К</span><span style="font-family: 'Times New Roman', serif;">А</span><span style="font-family: 'Courier New', monospace;">Д</span><span style="font-family: 'Verdana', sans-serif;">Р</span><span style="font-family: 'Georgia', serif;">И</span><span style="font-family: 'Trebuchet MS', sans-serif;">Т</span><span style="font-family: 'Webdings';">Ь</span>
             <br>
             <span style="font-family: 'Wingdings';">С</span><span style="font-family: 'Lucida Console', monospace;">У</span><span style="font-family: 'Brush Script MT', cursive;">Ч</span><span style="font-family: 'Papyrus', fantasy;">К</span><span style="font-family: 'Copperplate', fantasy;">У</span>
@@ -1310,7 +1311,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
         <img src="https://web.archive.org/web/20090830181814/http://geocities.com/ResearchTriangle/Campus/5288/worknew.gif" alt="Under Construction" style="height:80px; margin-top: 10px; animation: shake 0.5s infinite;">
     </footer>
     
-    <a href="/tinder-swipe{username_param}" class="zakadrit-button">
+    <a href="/tinder-swipe{{username_param}}" class="zakadrit-button">
         <span>ЗАКАДРИТЬ</span>
         <span>СУЧКУ!</span>
     </a>
@@ -1526,11 +1527,11 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
     </div>
     
     <div class="nav">
-        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
-        <a href="/products{username_param}" class="rainbow-text">Товары</a> | 
+        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
+        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
-        <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
+        <a href="/protected-page{{username_param}}" class="rainbow-text">Личный кабинет</a> |
         <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
     
@@ -1557,7 +1558,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
         <div class="product-list" id="disliked-products-list"></div>
     </div>
     
-    <a href="/products{username_param}" class="zakadrit-button">
+    <a href="/products{{username_param}}" class="zakadrit-button">
         <span>ЗАКАДРИТЬ</span>
         <span>СУЧКУ!</span>
     </a>
@@ -1705,10 +1706,125 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             }}, 300);
         }}
         
+        // Переменные для отслеживания перетаскивания
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let initialRotation = 0;
+        let swipeThreshold = 100; // Порог для определения свайпа
+        
+        // Функции для обработки перетаскивания
+        function handleStart(clientX, clientY) {{
+            const card = document.querySelector('.tinder-card.active');
+            if (!card || currentProductIndex >= shuffledProducts.length) return;
+            
+            isDragging = true;
+            startX = clientX;
+            startY = clientY;
+            
+            // Сохраняем текущую трансформацию
+            const transform = window.getComputedStyle(card).getPropertyValue('transform');
+            const matrix = new DOMMatrix(transform);
+            currentX = matrix.m41;
+            currentY = matrix.m42;
+            
+            // Удаляем transition для плавного движения
+            card.style.transition = 'none';
+        }}
+        
+        function handleMove(clientX, clientY) {{
+            if (!isDragging) return;
+            
+            const card = document.querySelector('.tinder-card.active');
+            if (!card) return;
+            
+            const deltaX = clientX - startX;
+            const deltaY = clientY - startY;
+            
+            // Перемещаем карточку
+            card.style.transform = `translate(${{currentX + deltaX}}px, ${{currentY + deltaY}}px) rotate(${{deltaX * 0.1}}deg)`;
+            
+            // Изменяем прозрачность фона в зависимости от направления свайпа
+            if (deltaX > 0) {{
+                card.style.boxShadow = `0 0 20px rgba(0, 255, 0, ${{Math.min(0.8, Math.abs(deltaX) / swipeThreshold * 0.8)}})`;
+            }} else if (deltaX < 0) {{
+                card.style.boxShadow = `0 0 20px rgba(255, 0, 0, ${{Math.min(0.8, Math.abs(deltaX) / swipeThreshold * 0.8)}})`;
+            }}
+        }}
+        
+        function handleEnd(clientX, clientY) {{
+            if (!isDragging) return;
+            
+            const card = document.querySelector('.tinder-card.active');
+            if (!card) return;
+            
+            isDragging = false;
+            
+            const deltaX = clientX - startX;
+            
+            // Возвращаем transition для анимации
+            card.style.transition = '';
+            
+            // Если перетащили достаточно далеко вправо - лайк
+            if (deltaX > swipeThreshold) {{
+                likeProduct();
+            }} 
+            // Если перетащили достаточно далеко влево - дизлайк
+            else if (deltaX < -swipeThreshold) {{
+                dislikeProduct();
+            }} 
+            // Иначе возвращаем карточку на место
+            else {{
+                card.style.transform = '';
+                card.style.boxShadow = '';
+            }}
+        }}
+        
         // Инициализация при загрузке страницы
         window.onload = function() {{
             initCards();
             updateProductLists();
+            
+            // Обработчики событий мыши
+            document.addEventListener('mousedown', function(e) {{
+                const card = document.querySelector('.tinder-card.active');
+                if (card && card.contains(e.target)) {{
+                    handleStart(e.clientX, e.clientY);
+                }}
+            }});
+            
+            document.addEventListener('mousemove', function(e) {{
+                handleMove(e.clientX, e.clientY);
+            }});
+            
+            document.addEventListener('mouseup', function(e) {{
+                handleEnd(e.clientX, e.clientY);
+            }});
+            
+            // Обработчики сенсорных событий для мобильных устройств
+            document.addEventListener('touchstart', function(e) {{
+                const card = document.querySelector('.tinder-card.active');
+                if (card && card.contains(e.target)) {{
+                    const touch = e.touches[0];
+                    handleStart(touch.clientX, touch.clientY);
+                    e.preventDefault(); // Предотвращаем скролл страницы
+                }}
+            }}, {{ passive: false }});
+            
+            document.addEventListener('touchmove', function(e) {{
+                const touch = e.touches[0];
+                handleMove(touch.clientX, touch.clientY);
+                e.preventDefault(); // Предотвращаем скролл страницы
+            }}, {{ passive: false }});
+            
+            document.addEventListener('touchend', function(e) {{
+                if (e.changedTouches.length > 0) {{
+                    const touch = e.changedTouches[0];
+                    handleEnd(touch.clientX, touch.clientY);
+                }}
+            }});
         }};
     </script>
     
@@ -1911,6 +2027,11 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
         
         .tinder-card.active {{
             z-index: 3;
+            cursor: grab;
+        }}
+        
+        .tinder-card.active:active {{
+            cursor: grabbing;
         }}
         
         .tinder-card.swiped-left {{
@@ -2082,11 +2203,11 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
     </div>
     
     <div class="nav">
-        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
-        <a href="/products{username_param}" class="rainbow-text">Товары</a> | 
+        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
+        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
-        <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
+        <a href="/protected-page{{username_param}}" class="rainbow-text">Личный кабинет</a> |
         <a href="/admin-panel?admin=1" class="blink" style="color:red; font-size: 24px; text-shadow: 0 0 10px yellow;">АДМИНКА</a>
     </div>
     
@@ -2112,6 +2233,11 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
         <div class="disliked-title blink">ОТВЕРГНУТЫЕ ТОВАРЫ:</div>
         <div class="product-list" id="disliked-products-list"></div>
     </div>
+    
+    <a href="/products{{username_param}}" class="zakadrit-button">
+        <span>ЗАКАДРИТЬ</span>
+        <span>СУЧКУ!</span>
+    </a>
     
     <script>
         // Список всех товаров
@@ -2256,10 +2382,125 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             }}, 300);
         }}
         
+        // Переменные для отслеживания перетаскивания
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let initialRotation = 0;
+        let swipeThreshold = 100; // Порог для определения свайпа
+        
+        // Функции для обработки перетаскивания
+        function handleStart(clientX, clientY) {{
+            const card = document.querySelector('.tinder-card.active');
+            if (!card || currentProductIndex >= shuffledProducts.length) return;
+            
+            isDragging = true;
+            startX = clientX;
+            startY = clientY;
+            
+            // Сохраняем текущую трансформацию
+            const transform = window.getComputedStyle(card).getPropertyValue('transform');
+            const matrix = new DOMMatrix(transform);
+            currentX = matrix.m41;
+            currentY = matrix.m42;
+            
+            // Удаляем transition для плавного движения
+            card.style.transition = 'none';
+        }}
+        
+        function handleMove(clientX, clientY) {{
+            if (!isDragging) return;
+            
+            const card = document.querySelector('.tinder-card.active');
+            if (!card) return;
+            
+            const deltaX = clientX - startX;
+            const deltaY = clientY - startY;
+            
+            // Перемещаем карточку
+            card.style.transform = `translate(${{currentX + deltaX}}px, ${{currentY + deltaY}}px) rotate(${{deltaX * 0.1}}deg)`;
+            
+            // Изменяем прозрачность фона в зависимости от направления свайпа
+            if (deltaX > 0) {{
+                card.style.boxShadow = `0 0 20px rgba(0, 255, 0, ${{Math.min(0.8, Math.abs(deltaX) / swipeThreshold * 0.8)}})`;
+            }} else if (deltaX < 0) {{
+                card.style.boxShadow = `0 0 20px rgba(255, 0, 0, ${{Math.min(0.8, Math.abs(deltaX) / swipeThreshold * 0.8)}})`;
+            }}
+        }}
+        
+        function handleEnd(clientX, clientY) {{
+            if (!isDragging) return;
+            
+            const card = document.querySelector('.tinder-card.active');
+            if (!card) return;
+            
+            isDragging = false;
+            
+            const deltaX = clientX - startX;
+            
+            // Возвращаем transition для анимации
+            card.style.transition = '';
+            
+            // Если перетащили достаточно далеко вправо - лайк
+            if (deltaX > swipeThreshold) {{
+                likeProduct();
+            }} 
+            // Если перетащили достаточно далеко влево - дизлайк
+            else if (deltaX < -swipeThreshold) {{
+                dislikeProduct();
+            }} 
+            // Иначе возвращаем карточку на место
+            else {{
+                card.style.transform = '';
+                card.style.boxShadow = '';
+            }}
+        }}
+        
         // Инициализация при загрузке страницы
         window.onload = function() {{
             initCards();
             updateProductLists();
+            
+            // Обработчики событий мыши
+            document.addEventListener('mousedown', function(e) {{
+                const card = document.querySelector('.tinder-card.active');
+                if (card && card.contains(e.target)) {{
+                    handleStart(e.clientX, e.clientY);
+                }}
+            }});
+            
+            document.addEventListener('mousemove', function(e) {{
+                handleMove(e.clientX, e.clientY);
+            }});
+            
+            document.addEventListener('mouseup', function(e) {{
+                handleEnd(e.clientX, e.clientY);
+            }});
+            
+            // Обработчики сенсорных событий для мобильных устройств
+            document.addEventListener('touchstart', function(e) {{
+                const card = document.querySelector('.tinder-card.active');
+                if (card && card.contains(e.target)) {{
+                    const touch = e.touches[0];
+                    handleStart(touch.clientX, touch.clientY);
+                    e.preventDefault(); // Предотвращаем скролл страницы
+                }}
+            }}, {{ passive: false }});
+            
+            document.addEventListener('touchmove', function(e) {{
+                const touch = e.touches[0];
+                handleMove(touch.clientX, touch.clientY);
+                e.preventDefault(); // Предотвращаем скролл страницы
+            }}, {{ passive: false }});
+            
+            document.addEventListener('touchend', function(e) {{
+                if (e.changedTouches.length > 0) {{
+                    const touch = e.changedTouches[0];
+                    handleEnd(touch.clientX, touch.clientY);
+                }}
+            }});
         }};
     </script>
     
