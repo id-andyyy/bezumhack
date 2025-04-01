@@ -162,26 +162,26 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
             overflow-y: auto;
         }}
         @keyframes backgroundFlash {{
-            0% {{ background-color: #ff00ff; }}
-            25% {{ background-color: #00ff00; }}
-            50% {{ background-color: #0000ff; }}
-            75% {{ background-color: #ffff00; }}
-            100% {{ background-color: #ff00ff; }}
+            0% {{ background-color: #ffffff; }}
+            25% {{ background-color: #ffffff; }}
+            50% {{ background-color: #ffffff; }}
+            75% {{ background-color: #ffffff; }}
+            100% {{ background-color: #ffffff; }}
         }}
         
         @keyframes backgroundSpin {{
             0% {{ transform: rotate(0deg); }}
-            100% {{ transform: rotate(360deg); }}
+            100% {{ transform: rotate(0deg); }}
         }}
         
         body {{
             font-family: Comic Sans MS, cursive;
-            background-image: url('https://kartinki-life.ru/articles/2021/03/11/poshlye-pozdravleniya-s-dnem-rozhdeniya-gif-4.gif');
+            background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
-            padding: 5px;
-            cursor: url('https://kartinki-life.ru/articles/2021/03/11/poshlye-pozdravleniya-s-dnem-rozhdeniya-gif-4.gif'), auto;
-            animation: backgroundFlash 2s infinite;
+            padding: 20px;
+            animation: none;
             overflow-x: hidden;
+            cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
     
         
@@ -1108,16 +1108,16 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
     <title>Наши товары</title>
     <style>
         @keyframes backgroundFlash {{
-            0% {{ background-color: #ff00ff; }}
-            25% {{ background-color: #00ff00; }}
-            50% {{ background-color: #0000ff; }}
-            75% {{ background-color: #ffff00; }}
-            100% {{ background-color: #ff00ff; }}
+            0% {{ background-color: #ffffff; }}
+            25% {{ background-color: #ffffff; }}
+            50% {{ background-color: #ffffff; }}
+            75% {{ background-color: #ffffff; }}
+            100% {{ background-color: #ffffff; }}
         }}
         
         @keyframes backgroundSpin {{
             0% {{ transform: rotate(0deg); }}
-            100% {{ transform: rotate(360deg); }}
+            100% {{ transform: rotate(0deg); }}
         }}
         
         body {{
@@ -1125,7 +1125,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
             padding: 20px;
-            animation: backgroundFlash 2s infinite;
+            animation: none;
             overflow-x: hidden;
             cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
@@ -1140,7 +1140,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             opacity: 0.7;
             z-index: -1;
-            animation: backgroundSpin 15s linear infinite;
+            animation: none;
             transform-origin: center center;
         }}
         
@@ -1156,7 +1156,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             padding: 5px;
             text-align: center;
             border: 5px dashed blue;
-            animation: backgroundFlash 1s infinite;
+            animation: none;
         }}
         
         .nav a {{
@@ -1172,7 +1172,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             padding: 15px;
             margin-bottom: 30px;
             background-color: #FFFFCC;
-            animation: backgroundFlash 3s infinite;
+            animation: none;
             box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
         }}
         
@@ -1185,20 +1185,20 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             max-height: 200px;
             margin: 10px 0;
             border: 5px ridge gold;
-            animation: borderColor 2s infinite;
+            animation: none;
         }}
         
         .epilepsy-image {{
-            animation: epilepsy 0.1s infinite, borderColor 2s infinite, shake 0.2s infinite;
-            filter: hue-rotate(0deg);
+            animation: none;
+            filter: none;
         }}
         
         @keyframes epilepsy {{
-            0% {{ filter: hue-rotate(0deg) contrast(200%) brightness(150%); }}
-            25% {{ filter: hue-rotate(90deg) contrast(300%) brightness(200%); }}
-            50% {{ filter: hue-rotate(180deg) contrast(400%) brightness(250%); }}
-            75% {{ filter: hue-rotate(270deg) contrast(300%) brightness(200%); }}
-            100% {{ filter: hue-rotate(360deg) contrast(200%) brightness(150%); }}
+            0% {{ filter: none; }}
+            25% {{ filter: none; }}
+            50% {{ filter: none; }}
+            75% {{ filter: none; }}
+            100% {{ filter: none; }}
         }}
         
         @keyframes borderColor {{
@@ -1222,7 +1222,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             font-weight: bold;
             cursor: pointer;
             font-size: 20px;
-            animation: borderColor 1s infinite;
+            animation: none;
         }}
         
         .buy-link {{
@@ -1287,7 +1287,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
             padding: 20px;
             margin-bottom: 30px;
             border: 5px dashed purple;
-            animation: backgroundFlash 3s infinite;
+            animation: none;
         }}
         
         .form-group {{
@@ -1486,16 +1486,16 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
     <title>СУПЕР ТОВАР: {product.name}</title>
     <style>
         @keyframes backgroundFlash {{
-            0% {{ background-color: #ff00ff; }}
-            25% {{ background-color: #00ff00; }}
-            50% {{ background-color: #0000ff; }}
-            75% {{ background-color: #ffff00; }}
-            100% {{ background-color: #ff00ff; }}
+            0% {{ background-color: #ffffff; }}
+            25% {{ background-color: #ffffff; }}
+            50% {{ background-color: #ffffff; }}
+            75% {{ background-color: #ffffff; }}
+            100% {{ background-color: #ffffff; }}
         }}
         
         @keyframes backgroundSpin {{
             0% {{ transform: rotate(0deg); }}
-            100% {{ transform: rotate(360deg); }}
+            100% {{ transform: rotate(0deg); }}
         }}
         
         body {{
@@ -1503,7 +1503,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
             padding: 20px;
-            animation: backgroundFlash 2s infinite;
+            animation: none;
             overflow-x: hidden;
             cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
@@ -1518,7 +1518,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             opacity: 0.7;
             z-index: -1;
-            animation: backgroundSpin 15s linear infinite;
+            animation: none;
             transform-origin: center center;
         }}
         
@@ -1534,7 +1534,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             padding: 5px;
             text-align: center;
             border: 5px dashed blue;
-            animation: backgroundFlash 1s infinite;
+            animation: none;
         }}
         
         .nav a {{
@@ -1551,7 +1551,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             margin: 20px auto;
             max-width: 800px;
             background-color: #FFFFCC;
-            animation: backgroundFlash 3s infinite;
+            animation: none;
             box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
             position: relative;
             z-index: 1;
@@ -1563,20 +1563,20 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
             margin: 10px auto;
             display: block;
             border: 8px ridge gold;
-            animation: borderColor 2s infinite;
+            animation: none;
         }}
         
         .epilepsy-image {{
-            animation: epilepsy 0.1s infinite, borderColor 2s infinite, shake 0.2s infinite;
-            filter: hue-rotate(0deg);
+            animation: none;
+            filter: none;
         }}
         
         @keyframes epilepsy {{
-            0% {{ filter: hue-rotate(0deg) contrast(200%) brightness(150%); }}
-            25% {{ filter: hue-rotate(90deg) contrast(300%) brightness(200%); }}
-            50% {{ filter: hue-rotate(180deg) contrast(400%) brightness(250%); }}
-            75% {{ filter: hue-rotate(270deg) contrast(300%) brightness(200%); }}
-            100% {{ filter: hue-rotate(360deg) contrast(200%) brightness(150%); }}
+            0% {{ filter: none; }}
+            25% {{ filter: none; }}
+            50% {{ filter: none; }}
+            75% {{ filter: none; }}
+            100% {{ filter: none; }}
         }}
         
         @keyframes borderColor {{
@@ -2104,16 +2104,16 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
     <title>ЗАКАДРИ СУЧКУ!!!</title>
     <style>
         @keyframes backgroundFlash {{
-            0% {{ background-color: #ff00ff; }}
-            25% {{ background-color: #00ff00; }}
-            50% {{ background-color: #0000ff; }}
-            75% {{ background-color: #ffff00; }}
-            100% {{ background-color: #ff00ff; }}
+            0% {{ background-color: #ffffff; }}
+            25% {{ background-color: #ffffff; }}
+            50% {{ background-color: #ffffff; }}
+            75% {{ background-color: #ffffff; }}
+            100% {{ background-color: #ffffff; }}
         }}
         
         @keyframes backgroundSpin {{
             0% {{ transform: rotate(0deg); }}
-            100% {{ transform: rotate(360deg); }}
+            100% {{ transform: rotate(0deg); }}
         }}
         
         body {{
@@ -2121,7 +2121,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
             padding: 20px;
-            animation: backgroundFlash 2s infinite;
+            animation: none;
             overflow-x: hidden;
             cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
@@ -2136,7 +2136,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             opacity: 0.7;
             z-index: -1;
-            animation: backgroundSpin 15s linear infinite;
+            animation: none;
             transform-origin: center center;
         }}
         
@@ -2152,7 +2152,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             padding: 5px;
             text-align: center;
             border: 5px dashed blue;
-            animation: backgroundFlash 1s infinite;
+            animation: none;
         }}
         
         .nav a {{
@@ -2216,7 +2216,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             position: relative;
             perspective: 1000px;
             border: 10px ridge gold;
-            animation: borderColor 2s infinite;
+            animation: none;
             background-color: rgba(255, 255, 255, 0.7);
             overflow: hidden;
         }}
@@ -2233,7 +2233,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             box-sizing: border-box;
             transform-origin: center;
             transition: transform 0.3s;
-            animation: backgroundFlash 3s infinite;
+            animation: none;
             text-align: center;
         }}
         
@@ -2295,16 +2295,16 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
         }}
         
         .epilepsy-image {{
-            animation: epilepsy 0.1s infinite, borderColor 2s infinite, shake 0.2s infinite;
-            filter: hue-rotate(0deg);
+            animation: none;
+            filter: none;
         }}
         
         @keyframes epilepsy {{
-            0% {{ filter: hue-rotate(0deg) contrast(200%) brightness(150%); }}
-            25% {{ filter: hue-rotate(90deg) contrast(300%) brightness(200%); }}
-            50% {{ filter: hue-rotate(180deg) contrast(400%) brightness(250%); }}
-            75% {{ filter: hue-rotate(270deg) contrast(300%) brightness(200%); }}
-            100% {{ filter: hue-rotate(360deg) contrast(200%) brightness(150%); }}
+            0% {{ filter: none; }}
+            25% {{ filter: none; }}
+            50% {{ filter: none; }}
+            75% {{ filter: none; }}
+            100% {{ filter: none; }}
         }}
         
         .cockroach {{
@@ -2359,7 +2359,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             padding: 10px;
             border: 5px dashed green;
             background-color: rgba(255, 255, 204, 0.8);
-            animation: backgroundFlash 3s infinite;
+            animation: none;
         }}
         
         .liked-title, .disliked-title {{
@@ -2390,7 +2390,7 @@ async def tinder_swipe(request: Request, db: Session = Depends(get_db)):
             width: 150px;
             text-align: center;
             background-color: #FFFFCC;
-            animation: backgroundFlash 3s infinite;
+            animation: none;
         }}
         
         .small-product img {{
@@ -2959,16 +2959,16 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
     <title>ЧАТ С ТОВАРОМ: {product.name}</title>
     <style>
         @keyframes backgroundFlash {{
-            0% {{ background-color: #ff00ff; }}
-            25% {{ background-color: #00ff00; }}
-            50% {{ background-color: #0000ff; }}
-            75% {{ background-color: #ffff00; }}
-            100% {{ background-color: #ff00ff; }}
+            0% {{ background-color: #ffffff; }}
+            25% {{ background-color: #ffffff; }}
+            50% {{ background-color: #ffffff; }}
+            75% {{ background-color: #ffffff; }}
+            100% {{ background-color: #ffffff; }}
         }}
         
         @keyframes backgroundSpin {{
             0% {{ transform: rotate(0deg); }}
-            100% {{ transform: rotate(360deg); }}
+            100% {{ transform: rotate(0deg); }}
         }}
         
         body {{
@@ -2976,7 +2976,7 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             margin: 0;
             padding: 20px;
-            animation: backgroundFlash 2s infinite;
+            animation: none;
             overflow-x: hidden;
             cursor: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif'), auto;
         }}
@@ -2991,7 +2991,7 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             background-image: url('https://cdn.otkritkiok.ru/posts/big/s-dnem-rozhdeniya-nachalnik-51936-1160976.gif');
             opacity: 0.7;
             z-index: -1;
-            animation: backgroundSpin 15s linear infinite;
+            animation: none;
             transform-origin: center center;
         }}
         
@@ -3007,7 +3007,7 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             padding: 5px;
             text-align: center;
             border: 5px dashed blue;
-            animation: backgroundFlash 1s infinite;
+            animation: none;
         }}
         
         .nav a {{
@@ -3069,9 +3069,9 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             flex-direction: column;
             max-width: 800px;
             margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.7);
+            background-color: rgba(255, 255, 255, 0.9);
             border: 8px ridge gold;
-            animation: borderColor 2s infinite;
+            animation: none;
             border-radius: 10px;
             overflow: hidden;
         }}
@@ -3080,7 +3080,7 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             display: flex;
             padding: 15px;
             background-color: #FFFFCC;
-            animation: backgroundFlash 2s infinite;
+            animation: none;
             border-bottom: 5px dashed purple;
         }}
         
@@ -3088,21 +3088,21 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             max-width: 150px;
             max-height: 150px;
             border: 5px ridge gold;
-            animation: borderColor 2s infinite;
+            animation: none;
             margin-right: 15px;
         }}
         
         .epilepsy-image {{
-            animation: epilepsy 0.1s infinite, borderColor 2s infinite, shake 0.2s infinite;
-            filter: hue-rotate(0deg);
+            animation: none;
+            filter: none;
         }}
         
         @keyframes epilepsy {{
-            0% {{ filter: hue-rotate(0deg) contrast(200%) brightness(150%); }}
-            25% {{ filter: hue-rotate(90deg) contrast(300%) brightness(200%); }}
-            50% {{ filter: hue-rotate(180deg) contrast(400%) brightness(250%); }}
-            75% {{ filter: hue-rotate(270deg) contrast(300%) brightness(200%); }}
-            100% {{ filter: hue-rotate(360deg) contrast(200%) brightness(150%); }}
+            0% {{ filter: none; }}
+            25% {{ filter: none; }}
+            50% {{ filter: none; }}
+            75% {{ filter: none; }}
+            100% {{ filter: none; }}
         }}
         
         .product-details {{
@@ -3132,8 +3132,8 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
         
         .chat-messages {{
             padding: 15px;
-            background-color: rgba(255, 255, 204, 0.8);
-            animation: backgroundFlash 3s infinite;
+            background-color: rgba(255, 255, 204, 0.9);
+            animation: none;
             height: 400px;
             overflow-y: auto;
             display: flex;
@@ -3156,8 +3156,8 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
         .message-bubble {{
             padding: 10px 15px;
             border-radius: 20px;
-            animation: backgroundFlash 3s infinite;
-            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+            animation: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }}
         
         .user-message .message-bubble {{
@@ -3174,7 +3174,7 @@ async def chat_page(product_id: int, request: Request, db: Session = Depends(get
             display: flex;
             padding: 15px;
             background-color: #CCFFFF;
-            animation: backgroundFlash 2s infinite;
+            animation: none;
             border-top: 5px dashed blue;
         }}
         
