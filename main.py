@@ -14,7 +14,6 @@ import json
 import requests
 
 
-os.makedirs("static", exist_ok=True)
 models.Base.metadata.create_all(bind=engine)
 def create_test_products():
     db = next(get_db())
