@@ -152,6 +152,8 @@ async def home(request: Request, db: Session = Depends(get_db), username: Option
 <head>
     <meta charset="UTF-8">
     <title>СУПЕР МАГАЗИН 2000!!!</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <style>
         html, body {{
             height: 100vh;
