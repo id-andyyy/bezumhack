@@ -1414,7 +1414,7 @@ async def list_products(request: Request, db: Session = Depends(get_db)):
         <img src="https://web.archive.org/web/20090830181814/http://geocities.com/ResearchTriangle/Campus/5288/worknew.gif" alt="Under Construction" style="height:80px; margin-top: 10px; animation: shake 0.5s infinite;">
     </footer>
     
-    <a href="/tinder-swipe{{username_param}}" class="zakadrit-button">
+    <a href="/tinder-swipe{username_param}" class="zakadrit-button">
         <span>ЗАКАДРИТЬ</span>
         <span>СУЧКУ!</span>
     </a>
@@ -1486,6 +1486,22 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
     elif product.gif_base64:
         product_image = f'<img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" class="product-image epilepsy-image" style="transform: rotate({-product.id * 5}deg);">'
     
+    products = db.query(models.User).filter(models.User.is_product != 0).all()
+    products_json = "["
+    for i, product in enumerate(products):
+        if i > 0:
+            products_json += ","
+        products_json += f'{{' \
+            f'"id": {product.id},' \
+            f'"name": "{product.name}",' \
+            f'"price": {product.price},' \
+            f'"description": "{product.description}",' \
+            f'"owner_id": {product.owner_id},' \
+            f'"secret_info": "{product.secret_info or ""}",' \
+            f'"image_url": "{product.image_url or ""}",' \
+            f'"gif_base64": "{product.gif_base64 or ""}"}}'
+    products_json += "]"
+
     return f'''<!DOCTYPE html>
 <html>
 <head>
@@ -1609,11 +1625,11 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
     </div>
     
     <div class="nav">
-        <a href="/{{username_param}}" class="rainbow-text">Главная</a> | 
-        <a href="/products{{username_param}}" class="rainbow-text">Товары</a> | 
+        <a href="/{username_param}" class="rainbow-text">Главная</a> | 
+        <a href="/products{username_param}" class="rainbow-text">Товары</a> | 
         <a href="/login-page" class="rainbow-text">Войти</a> | 
         <a href="/register-page" class="rainbow-text">Регистрация</a> |
-        <a href="/protected-page{{username_param}}" class="rainbow-text">Личный кабинет</a> |
+        <a href="/protected-page{username_param}" class="rainbow-text">Личный кабинет</a> |
     </div>
     
     <marquee scrollamount="20" behavior="alternate" style="background-color: red; color: yellow; font-size: 36px; font-weight: bold; padding: 15px; border: 5px dashed blue;">
@@ -1639,7 +1655,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
         <div class="product-list" id="disliked-products-list"></div>
     </div>
     
-    <a href="/products{{username_param}}" class="zakadrit-button">
+    <a href="/products{username_param}" class="zakadrit-button">
         <span>ЗАКАДРИТЬ</span>
         <span>СУЧКУ!</span>
     </a>
@@ -1898,7 +1914,7 @@ def get_product_html(product_id: int, request: Request, db: Session = Depends(ge
         
         <button class="buy-button" onclick="alert('ПОЗДРАВЛЯЕМ!!! ВЫ КУПИЛИ ТОВАР! С ВАШЕЙ КАРТЫ СПИСАНО {product.price * 10} РУБЛЕЙ!')">КУПИТЬ НЕМЕДЛЕННО!!!</button>
         
-        {f'<div class="secret-info">Секретная информация: {product.secret_info}</div>' if product.secret_info else ''}
+        {f'<div class="secret-info">Статус: {product.secret_info}</div>' if product.secret_info else ''}
     </div>
 </body>
 </html>'''
