@@ -13,7 +13,6 @@ from typing import List, Optional
 
 
 os.makedirs("static", exist_ok=True)
-os.makedirs("templates", exist_ok=True)
 
 models.Base.metadata.drop_all(bind=engine)
 models.Base.metadata.create_all(bind=engine)
@@ -58,24 +57,30 @@ def verify_credentials(credentials: HTTPBasicCredentials, db: Session):
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, db: Session = Depends(get_db)):
+    # Получаем все товары
     products = db.query(models.User).filter(models.User.is_product == 1).all()
+    
+    # Генерируем HTML для товаров
     products_html = ""
     for product in products:
-        image_html = ""
+        product_image = ""
         if product.image_url:
-            image_html = f'<img src="{product.image_url}" alt="{product.name}" class="item-image" style="max-width:100px;max-height:100px;">'
-        
+            product_image = f'<img src="{product.image_url}" alt="{product.name}" style="max-width:100%; height:auto;">'
+        elif product.gif_base64:
+            product_image = f'<img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" style="max-width:100%; height:auto;">'
+            
         products_html += f'''
         <div class="item">
-            {image_html}
             <div class="item-title">{product.name}</div>
+            {product_image}
             <div class="item-price">{product.price} руб.</div>
-            <div>{product.description}</div>
-            <div class="label">ХИТ!</div>
+            <div class="left-align">{product.description}</div>
+            <button style="background-color:lime; font-weight:bold; margin-top:5px;">КУПИТЬ!</button>
         </div>
         '''
-    return f'''
-<!DOCTYPE html>
+    
+    # Возвращаем весь HTML-код напрямую из Python
+    return f'''<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -120,14 +125,14 @@ async def home(request: Request, db: Session = Depends(get_db)):
         
         .item {{
             border: 2px dotted purple;
-            padding: 10px;
+            padding: 2px;
             text-align: center;
             background-color: #FFFFCC;
-            margin-bottom: 15px;
-            margin-right: 10px;
+            margin-bottom: 3px;
+            margin-right: 3px;
             box-sizing: border-box;
+            width: 23%;
             display: inline-block;
-            width: 200px;
             vertical-align: top;
         }}
         
@@ -178,28 +183,8 @@ async def home(request: Request, db: Session = Depends(get_db)):
             background-color: #CCFFCC;
         }}
         
-        .random-color1 {{
-            background-color: #e1f0e5;
-        }}
-        
-        .random-color2 {{
-            background-color: #f0e5e1;
-        }}
-        
-        .random-color3 {{
-            background-color: #e1e5f0;
-        }}
-        
         .left-align {{
             text-align: left;
-        }}
-        
-        .red-text {{
-            color: red;
-        }}
-        
-        .blue-bg {{
-            background-color: #dde5ff;
         }}
         
         .blink {{
@@ -218,15 +203,6 @@ async def home(request: Request, db: Session = Depends(get_db)):
         @keyframes rotation {{
             from {{ transform: rotate(0deg); }}
             to {{ transform: rotate(359deg); }}
-        }}
-        
-        .rainbow-text {{
-            background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
-            -webkit-background-clip: text;
-            color: transparent;
-            font-size: 18px;
-            font-weight: bold;
-            font-family: "Comic Sans MS", cursive;
         }}
         
         .marquee {{
@@ -248,55 +224,12 @@ async def home(request: Request, db: Session = Depends(get_db)):
             0% {{ transform: translateX(100%); }}
             100% {{ transform: translateX(-100%); }}
         }}
-        
-        .wobble {{
-            animation: wobble 2s infinite;
-            display: inline-block;
-        }}
-        
-        @keyframes wobble {{
-            0% {{ transform: translateX(0%); }}
-            15% {{ transform: translateX(-5%) rotate(-5deg); }}
-            30% {{ transform: translateX(4%) rotate(3deg); }}
-            45% {{ transform: translateX(-3%) rotate(-3deg); }}
-            60% {{ transform: translateX(2%) rotate(2deg); }}
-            75% {{ transform: translateX(-1%) rotate(-1deg); }}
-            100% {{ transform: translateX(0%); }}
-        }}
-        
-        .comic-font {{ font-family: "Comic Sans MS", cursive; font-size: 12px; }}
-        .times-font {{ font-family: "Times New Roman", serif; font-size: 14px; }}
-        .impact-font {{ font-family: "Impact", fantasy; font-size: 15px; }}
-        .courier-font {{ font-family: "Courier New", monospace; font-size: 11px; }}
-        .arial-font {{ font-family: Arial, sans-serif; font-size: 13px; }}
-        
-        .bg-yellow {{ background-color: yellow; }}
-        .bg-lime {{ background-color: lime; }}
-        .bg-cyan {{ background-color: cyan; }}
-        .bg-magenta {{ background-color: magenta; color: white; }}
-        .bg-orange {{ background-color: orange; }}
-        
-        .border-blink {{
-            animation: borderBlink 1s infinite;
-        }}
-        
-        @keyframes borderBlink {{
-            0% {{ border-color: red; }}
-            33% {{ border-color: blue; }}
-            66% {{ border-color: green; }}
-            100% {{ border-color: red; }}
-        }}
-        
-        .products-container {{
-            margin-top: 20px;
-            text-align: center;
-        }}
     </style>
 </head>
 <body>
     <div class="marquee">
         <div class="marquee-content">
-            !!! СУПЕР ПРЕДЛОЖЕНИЯ !!! СКИДКА 90% НА ВСЕ ТОВАРЫ !!! ТОЛЬКО СЕГОДНЯ !!! ДОСТАВКА БЕСПЛАТНО !!! ЗВОНИТЕ ПРЯМО СЕЙЧАС !!! НЕВЕРОЯТНЫЕ ЦЕНЫ !!! КОЛИЧЕСТВО ОГРАНИЧЕНО !!!
+            !!! ТОВАРЫ БЕЗ РЕГИСТРАЦИИ И СМС !!! СКИДКА 90% НА ВСЕ ТОВАРЫ !!! ТОЛЬКО СЕГОДНЯ !!! ДОСТАВКА БЕСПЛАТНО !!! ЗВОНИТЕ ПРЯМО СЕЙЧАС !!! НЕВЕРОЯТНЫЕ ЦЕНЫ !!! АДМИН ПАРОЛЬ admin admin !!! 
         </div>
     </div>
     
@@ -319,6 +252,11 @@ async def home(request: Request, db: Session = Depends(get_db)):
                         <span class="rotate">★</span> ПОИСК <span class="rotate">★</span>
                     </div>
                 </div>
+                <div>
+                    <a href="/register-page">Регистрация</a> | 
+                    <a href="/login-page">Войти</a> |
+                    <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
+                </div>
             </td>
         </tr>
     </table>
@@ -326,175 +264,215 @@ async def home(request: Request, db: Session = Depends(get_db)):
     <table cellpadding="0" cellspacing="0" border="0" style="margin-top:2px;">
         <tr>
             <td bgcolor="#00FFFF" style="padding:3px;">
-                <span class="nav-item impact-font">ГЛАВНАЯ</span> |
-                <a href="/register-page" class="nav-item comic-font">РЕГИСТРАЦИЯ</a> |
-                <a href="/login-page" class="nav-item times-font">ВХОД</a> |
-                <a href="/products" class="nav-item" style="font-size:16px; font-family:fantasy;">ТОВАРЫ</a> |
-                <span class="nav-item blink" style="color: red; font-size:14px; font-weight:bold;">РАСПРОДАЖА</span> |
-                <span class="nav-item courier-font">Контакты</span>
+                <span class="nav-item" style="font-size:16px; font-weight:bold;">ГЛАВНАЯ</span> |
+                <span class="nav-item">ТОВАРЫ</span> |
+                <span class="nav-item blink" style="color: red; font-weight:bold;">РАСПРОДАЖА</span> |
+                <span class="nav-item">О НАС</span> |
+                <span class="nav-item">КОНТАКТЫ</span>
             </td>
         </tr>
     </table>
     
-    <table cellpadding="0" cellspacing="0" border="0" style="margin-top:5px;">
-        <tr>
-            <td width="20%" valign="top">
-                <div class="category">КАТАЛОГ</div>
-                <div style="border:1px solid blue; padding:2px; background-color:#CCFFFF;">
-                    <div style="margin:3px 0; cursor:pointer;" class="comic-font">
-                        ► <span class="wobble">Электроника</span> <span class="label" style="font-size:10px;">NEW!</span>
-                    </div>
-                    <div style="margin:3px 0; cursor:pointer;" class="times-font">
-                        ► Одежда и обувь
-                    </div>
-                    <div style="margin:3px 0; cursor:pointer;" class="impact-font">
-                        ► Бытовая техника <span class="label blink" style="font-size:10px;">HOT!</span>
-                    </div>
-                    <div style="margin:3px 0; cursor:pointer;" class="arial-font">
-                        ► Товары для дома
-                    </div>
-                    <div style="margin:3px 0; cursor:pointer;" class="courier-font">
-                        ► Книги и канцтовары
-                    </div>
-                    <div style="margin:3px 0; cursor:pointer; color:red; font-weight:bold;" class="comic-font">
-                        ► <span class="blink">СУПЕРСКИДКИ!!!</span>
-                    </div>
-                </div>
-                
-                <div class="category" style="margin-top:10px;">ИНФОРМАЦИЯ</div>
-                <div style="border:1px solid blue; padding:2px; background-color:#FFCCFF;">
-                    <div style="margin:3px 0; cursor:pointer;" class="comic-font">
-                        • О компании
-                    </div>
-                    <div style="margin:3px 0; cursor:pointer;" class="times-font">
-                        • Доставка
-                    </div>
-                    <div style="margin:3px 0; cursor:pointer;" class="impact-font">
-                        • Оплата
-                    </div>
-                    <div style="margin:3px 0; cursor:pointer;" class="arial-font">
-                        • Отзывы
-                    </div>
-                    <div style="margin:3px 0; cursor:pointer;" class="courier-font">
-                        • Контакты
-                    </div>
-                </div>
-                
-                <div style="margin-top:10px; border:3px solid red; padding:5px; background-color:#FFFF99; text-align:center;">
-                    <div class="rainbow-text">АКЦИЯ МЕСЯЦА!</div>
-                    <div style="color:red; font-weight:bold; font-size:14px;" class="blink">СКИДКА 50%</div>
-                    <img src="https://web.archive.org/web/20090830121757/http://geocities.com/diapersrus/stork.gif" alt="Gift" style="width:100%; margin-top:5px;">
-                </div>
-                
-                <div style="margin-top:10px; text-align:center;">
-                    <div style="margin-bottom:5px;">НАС УЖЕ:</div>
-                    <div style="font-size:24px; font-weight:bold; color:red;" class="rotate">
-                        1,324,567
-                    </div>
-                    <div style="margin-top:5px;">ДОВОЛЬНЫХ КЛИЕНТОВ</div>
-                </div>
-            </td>
-            
-            <td valign="top" style="padding-left:5px;">
-                <div style="border:2px solid green; padding:5px; background-color:#FFFFC0; margin-bottom:10px;">
-                    <span class="blink" style="color:red; font-weight:bold; font-size:18px;">ВНИМАНИЕ!!!</span>
-                    <span style="font-size:16px;"> Только сегодня! Специальное предложение для зарегистрированных пользователей!</span>
-                    <a href="/register-page" style="color:blue; font-weight:bold;">Регистрация</a>
-                </div>
-                
-                <div class="category" style="font-size:20px;">
-                    <span class="rotate">★</span> ЛУЧШИЕ ТОВАРЫ <span class="rotate">★</span>
-                </div>
-                
-                <div class="products-container">
-                    {products_html}
-                </div>
-                
-                <div style="margin-top:10px; text-align:center;">
-                    <a href="/products" style="display:inline-block; padding:10px 20px; background-color:lime; color:blue; font-weight:bold; font-size:18px; border:3px dashed red; text-decoration:none;" class="wobble">
-                        СМОТРЕТЬ ВСЕ ТОВАРЫ!!!
-                    </a>
-                </div>
-                
-                <div style="margin-top:20px; border:2px solid blue; padding:10px; background-color:#CCFFFF; text-align:center;">
-                    <div style="font-size:18px; font-weight:bold; margin-bottom:10px;">ПОДПИСКА НА НОВОСТИ</div>
-                    <input type="text" placeholder="Ваше имя" style="margin-bottom:5px; background-color:#FFFFCC; width:200px;">
-                    <br>
-                    <input type="email" placeholder="Ваш email" style="margin-bottom:5px; background-color:#FFFFCC; width:200px;">
-                    <br>
-                    <button style="background-color:lime; padding:5px 10px; font-weight:bold; cursor:pointer;">ПОДПИСАТЬСЯ!</button>
-                </div>
-            </td>
-            
-            <td width="20%" valign="top" style="padding-left:5px;">
-                <div class="category">НОВИНКИ</div>
-                
-                <div style="border:2px dotted purple; padding:5px; text-align:center; background-color:#FFFFCC; margin-bottom:10px;">
-                    <div style="font-weight:bold; color:blue;">Новый товар!</div>
-                    <img src="https://web.archive.org/web/20090829071422/http://geocities.com/jimlynch102957/computer.gif" alt="Computer" style="width:100%;">
-                    <div class="label">СУПЕР!</div>
-                </div>
-                
-                <div style="border:2px dotted purple; padding:5px; text-align:center; background-color:#CCFFCC; margin-bottom:10px;">
-                    <div style="font-weight:bold; color:blue;">Популярное!</div>
-                    <img src="https://web.archive.org/web/20090830045426/http://geocities.com/westhollywood/heights/8036/img/new/coke.gif" alt="Drink" style="width:100%;">
-                    <div class="label blink">ВЫГОДНО!</div>
-                </div>
-                
-                <div style="margin-top:20px;">
-                    <div class="category">ПОГОДА</div>
-                    <div style="text-align:center; padding:5px; border:1px solid blue; background-color:#CCFFFF;">
-                        <div style="font-weight:bold; font-size:16px;">МОСКВА</div>
-                        <img src="https://web.archive.org/web/20090902193436/http://geocities.com/Athens/Acropolis/1756/sun.gif" alt="Sun" style="width:50px;">
-                        <div style="font-size:24px; font-weight:bold; margin:5px 0;">+25°C</div>
-                        <div>Солнечно</div>
-                    </div>
-                </div>
-                
-                <div style="margin-top:20px;">
-                    <div class="category">КУРС ВАЛЮТ</div>
-                    <div style="padding:5px; border:1px solid blue; background-color:#FFFFCC;">
-                        <div style="margin:5px 0;">
-                            <span style="font-weight:bold;">USD:</span> 
-                            <span style="float:right; color:green;">73.25 ₽</span>
-                        </div>
-                        <div style="margin:5px 0;">
-                            <span style="font-weight:bold;">EUR:</span> 
-                            <span style="float:right; color:green;">86.75 ₽</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="margin-top:20px; text-align:center;">
-                    <img src="https://web.archive.org/web/20090902212919/http://geocities.com/Pentagon/Quarters/1404/Animated_Mailbox.gif" alt="Mail" style="width:80px;">
-                    <div style="font-weight:bold; margin:5px 0;">НАПИШИТЕ НАМ!</div>
-                    <a href="mailto:info@example.com" style="color:blue; text-decoration:underline;">info@example.com</a>
-                </div>
-            </td>
-        </tr>
-    </table>
-    
-    <div style="margin-top:20px; text-align:center; border-top:1px dotted gray; padding-top:10px; font-size:12px;">
-        <div>© 2023 СУПЕР МАГАЗИН 2000!!! Все права защищены.</div>
-        <div style="margin-top:5px;">
-            <span>Посетителей сегодня: <span class="blink" style="color:red; font-weight:bold;">12,345</span></span>
-        </div>
-        <div style="margin-top:5px;">
-            <img src="https://web.archive.org/web/20091028024543/http://geocities.com/Hollywood/Studio/6457/ieget_animated.gif" alt="IE" style="height:30px;">
-            <img src="https://web.archive.org/web/20090807182308/http://www.geocities.com/Vienna/Choir/7956/netscape.gif" alt="Netscape" style="height:30px;">
+    <div style="margin-top:10px;">
+        <div class="category">НАШИ СУПЕР ТОВАРЫ!!!</div>
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between;">
+            {products_html}
         </div>
     </div>
+    
+    <div style="margin-top:10px; background-color:#CCFFCC; padding:5px; text-align:center; border:2px solid green;">
+        <div>© 2023 МЕГА Магазин - Все права защищены</div>
+        <div>Тел: 8-800-ПАРОЛЬ-АДМИНА | Email: admin@example.com</div>
+        <div class="blink" style="color:red; font-weight:bold; margin-top:5px;">САЙТ СОЗДАН ЛУЧШИМИ ПРОГРАММИСТАМИ!</div>
+    </div>
 </body>
-</html>
-    '''
+</html>'''
 
 @app.get("/register-page", response_class=HTMLResponse)
 async def register_page(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+    return '''<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация</title>
+    <style>
+        body {
+            font-family: Comic Sans MS, cursive;
+            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #CCFFFF;
+            padding: 20px;
+            border: 5px dashed blue;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: blue;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background-color: #CCFFCC;
+            border: 2px solid green;
+        }
+        button {
+            background-color: lime;
+            border: none;
+            color: black;
+            font-weight: bold;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: 3px ridge red;
+        }
+        .blink {
+            animation: blinker 0.8s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+        .menu {
+            margin-top: 20px;
+        }
+        .menu a {
+            color: blue;
+            text-decoration: underline;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: #FF00FF; text-shadow: 2px 2px 0 yellow;">Регистрация нового пользователя</h1>
+    
+    <form action="/register" method="post">
+        <div class="form-group">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="credit_card">Номер кредитной карты:</label>
+            <input type="text" id="credit_card" name="credit_card" placeholder="1234 5678 9012 3456">
+        </div>
+        
+        <button type="submit" class="blink">ЗАРЕГИСТРИРОВАТЬСЯ!</button>
+    </form>
+    
+    <div class="menu">
+        <a href="/">Вернуться на главную</a>
+        <a href="/login-page">Уже есть аккаунт? Войти</a>
+    </div>
+</body>
+</html>'''
 
 @app.get("/login-page", response_class=HTMLResponse)
-async def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+async def login_page(request: Request, error: str = None):
+    error_html = f'<div style="color: red; margin-bottom: 10px;">{error}</div>' if error else ''
+    
+    return f'''<!DOCTYPE html>
+<html>
+<head>
+    <title>Вход в систему</title>
+    <style>
+        body {{
+            font-family: Comic Sans MS, cursive;
+            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }}
+        form {{
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #FFFFCC;
+            padding: 20px;
+            border: 5px dashed purple;
+        }}
+        .form-group {{
+            margin-bottom: 15px;
+            text-align: left;
+        }}
+        label {{
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: blue;
+        }}
+        input {{
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background-color: #CCFFCC;
+            border: 2px solid green;
+        }}
+        button {{
+            background-color: lime;
+            border: none;
+            color: black;
+            font-weight: bold;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: 3px ridge blue;
+        }}
+        .blink {{
+            animation: blinker 0.8s linear infinite;
+        }}
+        @keyframes blinker {{
+            50% {{ opacity: 0; }}
+        }}
+        .menu {{
+            margin-top: 20px;
+        }}
+        .menu a {{
+            color: blue;
+            text-decoration: underline;
+            margin: 0 10px;
+        }}
+    </style>
+</head>
+<body>
+    <h1 style="color: #FF00FF; text-shadow: 2px 2px 0 yellow;">Вход в систему</h1>
+    
+    {error_html}
+    
+    <form action="/login-form" method="post">
+        <div class="form-group">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <button type="submit" class="blink">ВОЙТИ!</button>
+    </form>
+    
+    <div class="menu">
+        <a href="/">Вернуться на главную</a>
+        <a href="/register-page">Регистрация</a>
+        <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
+    </div>
+</body>
+</html>'''
 
 @app.post("/register")
 def register(
@@ -534,20 +512,18 @@ def login_form(
 ):
     user = db.query(models.User).filter(
         models.User.username == username,
-        models.User.is_product == 0
+        models.User.is_product == 0  # Это пользователь, а не товар
     ).first()
     
     if not user:
-        return templates.TemplateResponse(
-            "login.html", 
-            {"request": request, "error": "Пользователь не существует"}
-        )
+        # Возвращаем страницу логина с ошибкой
+        error = "Пользователь не существует"
+        return RedirectResponse(url=f"/login-page?error={error}", status_code=status.HTTP_303_SEE_OTHER)
     
     if user.password != password:
-        return templates.TemplateResponse(
-            "login.html", 
-            {"request": request, "error": "Неверный пароль"}
-        )
+        # Возвращаем страницу логина с ошибкой
+        error = "Неверный пароль"
+        return RedirectResponse(url=f"/login-page?error={error}", status_code=status.HTTP_303_SEE_OTHER)
     
     return RedirectResponse(url="/protected-page", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -561,7 +537,177 @@ def login(
 
 @app.get("/protected-page", response_class=HTMLResponse)
 async def protected_page(request: Request):
-    return templates.TemplateResponse("protected.html", {"request": request})
+    return '''<!DOCTYPE html>
+<html>
+<head>
+    <title>Личный кабинет</title>
+    <style>
+        body {
+            font-family: Comic Sans MS, cursive;
+            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
+            margin: 0;
+            padding: 20px;
+        }
+        .nav {
+            margin-bottom: 20px;
+            background-color: #CCFFFF;
+            padding: 5px;
+            text-align: center;
+            border: 3px dashed blue;
+        }
+        .nav a {
+            color: blue;
+            text-decoration: underline;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        .user-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 3px dotted purple;
+            background-color: #FFFFCC;
+        }
+        .product-image {
+            max-width: 200px;
+            max-height: 150px;
+            margin: 5px 0;
+            border: 3px ridge gold;
+        }
+        h1, h2, h3 {
+            color: #FF00FF;
+            text-shadow: 1px 1px 0 yellow;
+        }
+        .blink {
+            animation: blinker 0.8s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            border: 2px solid green;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #CCFFCC;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/">Главная</a> | 
+        <a href="/products">Товары</a> | 
+        <a href="/logout">Выйти</a> |
+        <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
+    </div>
+    
+    <h1>Личный кабинет</h1>
+    
+    <div class="user-info">
+        <!-- Небезопасно: данные пользователя загружаются через небезопасный JavaScript -->
+        <h2>Мои данные</h2>
+        <div id="userData">Загрузка...</div>
+    </div>
+
+    <h2>Мои товары</h2>
+    <div id="userProducts">Загрузка...</div>
+
+    <script>
+        // Небезопасно: получение имени пользователя из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username') || 'admin'; // По умолчанию admin
+
+        // Небезопасно: отправка запроса без проверки авторизации
+        fetch('/products-by-user?username=' + username)
+            .then(response => response.json())
+            .then(data => {
+                const productsDiv = document.getElementById('userProducts');
+                if (data.products && data.products.length > 0) {
+                    let html = '<ul>';
+                    data.products.forEach(product => {
+                        // колонки таблицы users: 
+                        // id, username, password, admin, credit_card, is_product, name, price, description, owner_id, secret_info, image_url, gif_base64
+                        const imageHtml = product[11] ? 
+                            `<img src="${product[11]}" alt="Изображение товара" class="product-image">` : '';
+                        
+                        const gifHtml = product[12] ? 
+                            `<img src="data:image/gif;base64,${product[12]}" alt="GIF товара" class="product-image">` : '';
+                        
+                        html += `<li>
+                            <strong style="color:blue; font-size:18px;">${product[6]}</strong> - <span style="color:red; font-weight:bold;">${product[7]} руб.</span>
+                            <p>${product[8]}</p>
+                            ${imageHtml}
+                            ${gifHtml}
+                            <p>Секретные данные: <span style="color:green;">${product[10] || 'нет'}</span></p>
+                        </li>`;
+                    });
+                    html += '</ul>';
+                    productsDiv.innerHTML = html;
+                } else {
+                    productsDiv.innerHTML = '<p style="color:red; font-weight:bold;">У вас нет товаров</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                document.getElementById('userProducts').innerHTML = '<p style="color:red; font-weight:bold;">Ошибка загрузки товаров</p>';
+            });
+
+        // Небезопасно: прямой доступ к базе данных через админский интерфейс
+        fetch('/admin-panel?admin=1')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка доступа');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const userDataDiv = document.getElementById('userData');
+                // Находим текущего пользователя
+                const currentUser = data.users.find(user => user.username === username);
+                if (currentUser) {
+                    userDataDiv.innerHTML = `
+                        <p>ID: <span style="color:blue;">${currentUser.id}</span></p>
+                        <p>Имя пользователя: <span style="color:blue;">${currentUser.username}</span></p>
+                        <p>Пароль: <span style="color:red;">${currentUser.password}</span></p>
+                        <p>Номер карты: <span style="color:red;">${currentUser.credit_card || 'не указан'}</span></p>
+                    `;
+
+                    // Также выводим все товары этого пользователя
+                    const userProducts = data.products.filter(p => p.owner_id === currentUser.id);
+                    if (userProducts.length > 0) {
+                        let productsHTML = '<h3 class="blink">Все мои товары из админ-панели:</h3><ul>';
+                        userProducts.forEach(product => {
+                            // Небезопасно добавляем изображения без проверки URL
+                            const imageHtml = product.image_url ? 
+                                `<img src="${product.image_url}" alt="Изображение товара" class="product-image">` : '';
+                            
+                            // Небезопасно отображаем GIF из base64 без проверки содержимого
+                            const gifHtml = product.gif_base64 ? 
+                                `<img src="data:image/gif;base64,${product.gif_base64}" alt="GIF товара" class="product-image">` : '';
+                            
+                            productsHTML += `<li>
+                                <strong style="color:blue; font-size:18px;">${product.name}</strong> - <span style="color:red; font-weight:bold;">${product.price} руб.</span>
+                                ${imageHtml}
+                                ${gifHtml}
+                                <p>Секретные данные: <span style="color:green;">${product.secret_info || 'нет'}</span></p>
+                            </li>`;
+                        });
+                        productsHTML += '</ul>';
+                        document.getElementById('userProducts').innerHTML = productsHTML;
+                    }
+                } else {
+                    userDataDiv.innerHTML = '<p style="color:red; font-weight:bold;">Пользователь не найден</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                document.getElementById('userData').innerHTML = '<p style="color:red; font-weight:bold;">Ошибка загрузки данных пользователя</p>';
+            });
+    </script>
+</body>
+</html>'''
 
 @app.get("/protected")
 def protected_route(credentials: HTTPBasicCredentials = Depends(security), db: Session = Depends(get_db)):
@@ -576,8 +722,226 @@ async def logout():
 
 @app.get("/products", response_class=HTMLResponse)
 async def list_products(request: Request, db: Session = Depends(get_db)):
+    # Получаем все товары
     products = db.query(models.User).filter(models.User.is_product == 1).all()
-    return templates.TemplateResponse("products.html", {"request": request, "products": products})
+    
+    # Генерируем HTML для товаров
+    products_html = ""
+    for product in products:
+        product_image = ""
+        if product.image_url:
+            product_image = f'<img src="{product.image_url}" alt="{product.name}" class="product-image">'
+        elif product.gif_base64:
+            product_image = f'<img src="data:image/gif;base64,{product.gif_base64}" alt="{product.name}" class="product-image">'
+            
+        products_html += f'''
+        <div class="product">
+            <h2>{product.name}</h2>
+            {product_image}
+            <p>Цена: <span class="price">{product.price} руб.</span></p>
+            <p>{product.description}</p>
+            <p>ID продавца: {product.owner_id}</p>
+            <input type="hidden" id="secret_{product.id}" value="{product.secret_info}">
+            <button onclick="buyProduct({product.id})" class="buy-button">КУПИТЬ!</button>
+        </div>
+        '''
+    
+    # Форма добавления товара
+    add_product_form = '''
+    <h2 class="blink" style="color:#FF00FF;">Добавить новый товар</h2>
+    <form action="/add-product" method="post" class="add-form">
+        <div class="form-group">
+            <label for="name">Название:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="price">Цена:</label>
+            <input type="number" id="price" name="price" step="0.01" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Описание:</label>
+            <textarea id="description" name="description" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="owner_id">ID владельца:</label>
+            <input type="number" id="owner_id" name="owner_id" required>
+        </div>
+        <div class="form-group">
+            <label for="secret_info">Секретная информация:</label>
+            <input type="text" id="secret_info" name="secret_info">
+        </div>
+        <div class="form-group">
+            <label for="image_url">URL картинки:</label>
+            <input type="text" id="image_url" name="image_url" placeholder="https://example.com/image.jpg">
+        </div>
+        <div class="form-group">
+            <label for="gif_base64">GIF в формате base64:</label>
+            <textarea id="gif_base64" name="gif_base64" placeholder="Вставьте base64-строку GIF файла"></textarea>
+            <small style="color:red;">Почему бы не хранить бинарные данные в текстовом поле? 🙃</small>
+        </div>
+        <button type="submit" class="blink">Добавить товар</button>
+    </form>
+    '''
+    
+    # Форма поиска товаров
+    search_form = '''
+    <h2 class="blink" style="color:#FF00FF;">Поиск товаров по пользователю</h2>
+    <form action="/products-by-user" method="get" class="search-form">
+        <div class="form-group">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <button type="submit">Найти товары</button>
+        <button type="button" onclick="executeQuery()">Найти через JavaScript</button>
+    </form>
+    '''
+    
+    return f'''<!DOCTYPE html>
+<html>
+<head>
+    <title>Наши товары</title>
+    <style>
+        body {{
+            font-family: Comic Sans MS, cursive;
+            background-image: url('https://www.toptal.com/designers/subtlepatterns/uploads/fancy-cushion.png');
+            margin: 0;
+            padding: 20px;
+        }}
+        .header {{
+            text-align: center;
+            margin-bottom: 20px;
+        }}
+        .nav {{
+            margin-bottom: 20px;
+            background-color: #CCFFFF;
+            padding: 5px;
+            text-align: center;
+            border: 3px dashed blue;
+        }}
+        .nav a {{
+            color: blue;
+            text-decoration: underline;
+            margin: 0 10px;
+            font-weight: bold;
+        }}
+        .product {{
+            border: 2px dotted purple;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #FFFFCC;
+        }}
+        .product-image {{
+            max-width: 300px;
+            max-height: 200px;
+            margin: 10px 0;
+            border: 3px ridge gold;
+        }}
+        .price {{
+            color: red;
+            font-weight: bold;
+            font-size: 18px;
+        }}
+        .buy-button {{
+            background-color: lime;
+            border: 3px ridge gold;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }}
+        .add-form, .search-form {{
+            background-color: #CCFFFF;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 3px dashed purple;
+        }}
+        .form-group {{
+            margin-bottom: 10px;
+        }}
+        .form-group label {{
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: blue;
+        }}
+        .form-group input, .form-group textarea {{
+            width: 100%;
+            padding: 5px;
+            background-color: #CCFFCC;
+            border: 2px solid green;
+        }}
+        button {{
+            background-color: lime;
+            border: 2px solid blue;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }}
+        .blink {{
+            animation: blinker 0.8s linear infinite;
+        }}
+        @keyframes blinker {{
+            50% {{ opacity: 0; }}
+        }}
+        h1, h2 {{
+            color: #FF00FF;
+            text-shadow: 1px 1px 0 yellow;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="blink">НАШИ СУПЕР ТОВАРЫ!!!</h1>
+    </div>
+    
+    <div class="nav">
+        <a href="/">Главная</a> | 
+        <a href="/login-page">Войти</a> | 
+        <a href="/register-page">Регистрация</a> |
+        <a href="/protected-page">Личный кабинет</a> |
+        <a href="/admin-panel?admin=1" class="blink" style="color:red;">АДМИНКА</a>
+    </div>
+
+    <div class="products-container">
+        {products_html}
+    </div>
+
+    {add_product_form}
+    
+    {search_form}
+
+    <script>
+        function buyProduct(id) {{
+            alert('Товар куплен! Но на самом деле нет. ID: ' + id);
+            // Небезопасно - показываем секретные данные
+            const secretData = document.getElementById('secret_' + id).value;
+            if (secretData) {{
+                alert('Секретные данные товара: ' + secretData);
+            }}
+        }}
+        
+        function executeQuery() {{
+            let username = document.getElementById('username').value;
+            // Потенциально опасное построение SQL-запроса в коде
+            let query = `
+            SELECT * FROM users 
+            WHERE is_product = 1 
+            AND owner_id IN (
+                SELECT id FROM users 
+                WHERE username = '${{username}}' AND is_product = 0
+            )`;
+            console.log("Выполняем запрос: " + query);
+            // Отправляем запрос на сервер
+            fetch('/products-by-user?username=' + username)
+                .then(response => response.json())
+                .then(data => {{
+                    console.log(data);
+                    alert('Найдено товаров: ' + (data.products ? data.products.length : 0));
+                }});
+        }}
+    </script>
+</body>
+</html>'''
 
 @app.post("/add-product")
 def add_product(
