@@ -1,4 +1,4 @@
-![Art](https://i.postimg.cc/YqrFWvhq/art.png)
+![Art](https://i.postimg.cc/B696tpPv/art-ru.png)
 
 ![GitHub Created At](https://img.shields.io/github/created-at/id-andyyy/bezumhack?style=flat&color=FF00B2)
 ![Lines Of Code](https://tokei.rs/b1/github/id-andyyy/bezumhack?style=flat&category=code&color=8400FF)
