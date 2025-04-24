@@ -4,7 +4,7 @@
 ![Lines Of Code](https://tokei.rs/b1/github/id-andyyy/bezumhack?style=flat&category=code&color=8400FF)
 ![Top Language](https://img.shields.io/github/languages/top/id-andyyy/bezumhack?style=flat)
 
-# Project for the hackathon [BEZUMhack](https://bezumci.wtf/hack/) 🍓
+# Joke Project for the Hackathon [BEZUMhack](https://bezumci.wtf/hack/) 🍓
 
 ⚠️ This project was created as part of the hackathon [BEZUMhack](https://bezumci.wtf/hack/). The goal was to create the most unusual, funny, and insecure website. This project **intentionally** includes anti-patterns and is full of various vulnerabilities. **Do not take the code seriously!** 🚫
 
