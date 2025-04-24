@@ -28,19 +28,19 @@
 
 ## Скриншоты
 
-<center>Главная страница</center>
+<p align="center">Главная страница</p>
 
 ![Главная страница](https://i.postimg.cc/rsB5pMJd/image.png)
 
-<center>Режим Тиндера</center>
+<p align="center">Режим Тиндера</p>
 
 ![Режим Тиндера](https://i.postimg.cc/dtC8xZsG/3.png)
 
-<center>Чат с товаром</center>
+<p align="center">Чат с товаром</p>
 
 ![Чат с товаром](https://i.postimg.cc/qqh80z8V/5.png)
 
-<center>Добавление товара</center>
+<p align="center">Добавление товара</p>
 
 ![Добавление товара](https://i.postimg.cc/ydNmQfxN/7.png)
 
