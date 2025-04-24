@@ -30,19 +30,19 @@ Features:
 
 <p align="center">Home Page</p>
 
-![Home Page](https://i.postimg.cc/rsB5pMJd/image.png)
+![Home Page](https://i.postimg.cc/kgSPDmQx/1.png)
 
 <p align="center">Tinder Mode</p>
 
-![Tinder Mode](https://i.postimg.cc/dtC8xZsG/3.png)
+![Tinder Mode](https://i.postimg.cc/6QLsLf1q/3.png)
 
 <p align="center">Chat with Product</p>
 
-![Chat with Product](https://i.postimg.cc/qqh80z8V/5.png)
+![Chat with Product](https://i.postimg.cc/wBzZvsTp/5.png)
 
 <p align="center">Adding Product</p>
 
-![Adding Product](https://i.postimg.cc/ydNmQfxN/7.png)
+![Adding Product](https://i.postimg.cc/Vv2HcJH2/7.png)
 
 ## Technologies and Tools
 

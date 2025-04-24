@@ -30,19 +30,19 @@
 
 <p align="center">Главная страница</p>
 
-![Главная страница](https://i.postimg.cc/rsB5pMJd/image.png)
+![Главная страница](https://i.postimg.cc/kgSPDmQx/1.png)
 
 <p align="center">Режим Тиндера</p>
 
-![Режим Тиндера](https://i.postimg.cc/dtC8xZsG/3.png)
+![Режим Тиндера](https://i.postimg.cc/6QLsLf1q/3.png)
 
 <p align="center">Чат с товаром</p>
 
-![Чат с товаром](https://i.postimg.cc/qqh80z8V/5.png)
+![Чат с товаром](https://i.postimg.cc/wBzZvsTp/5.png)
 
 <p align="center">Добавление товара</p>
 
-![Добавление товара](https://i.postimg.cc/ydNmQfxN/7.png)
+![Добавление товара](https://i.postimg.cc/Vv2HcJH2/7.png)
 
 ## Технологии и инструменты
 
