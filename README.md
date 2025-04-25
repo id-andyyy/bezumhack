@@ -1,13 +1,13 @@
-![Art](https://i.postimg.cc/YqrFWvhq/art.png)
+![Art](https://i.postimg.cc/B696tpPv/art-ru.png)
 
 ![GitHub Created At](https://img.shields.io/github/created-at/id-andyyy/bezumhack?style=flat&color=FF00B2)
 ![Lines Of Code](https://tokei.rs/b1/github/id-andyyy/bezumhack?style=flat&category=code&color=8400FF)
 ![Top Language](https://img.shields.io/github/languages/top/id-andyyy/bezumhack?style=flat)
 
-# Joke Project for the Hackathon [BEZUMhack](https://bezumci.wtf/hack/)&nbsp;&#127827;
+# Joke Project for the Hackathon [БЕЗУМhack](https://bezumci.wtf/hack/)&nbsp;&#127827;
 
 &#10071;
-&nbsp;This project was created as part of the hackathon [BEZUMhack](https://bezumci.wtf/hack/). The goal was to create the most unusual, funny, and insecure website. This project **intentionally** includes anti-patterns and is full of various vulnerabilities. **Do not take the code seriously!**&nbsp;&#128683;
+&nbsp;This project was created as part of the hackathon [БЕЗУМhack](https://bezumci.wtf/hack/). The goal was to create the most unusual, funny, and insecure website. This project **intentionally** includes anti-patterns and is full of various vulnerabilities. **Do not take the code seriously!**&nbsp;&#128683;
 
 ## Description
 A revolutionary platform for dating with products in the style of Tinder. A service where each item has its own personality and character.&nbsp;&#128521;
@@ -58,7 +58,7 @@ Features:
 
 Development Features:
 
-- The project was written in one day as part of the hackathon [BEZUMhack&nbsp;&#128104;&#8205;&#128187;](https://bezumci.wtf/hack/), the goal of which was to present the craziest project
+- The project was written in one day as part of the hackathon [БЕЗУМhack&nbsp;&#128104;&#8205;&#128187;](https://bezumci.wtf/hack/), the goal of which was to present the craziest project
 - The Deepseek neural network was used to generate product responses
 - NON-adaptive layout
 - HTML, CSS, and JS are returned as `HTMLResponse` (the "best" practices are used)
